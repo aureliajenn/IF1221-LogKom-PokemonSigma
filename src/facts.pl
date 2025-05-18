@@ -42,9 +42,24 @@ exp_given_rarity(epic,30).
 exp_given_rarity(legendary,40).
 
 /*fakta skill slot species_skill(Species, Level, SkillSlot, SkillName).*/
-species_skill(charmander,1,1,scratch).
+species_skill(charmander,5,1,scratch).
 species_skill(charmander,10,2,ember).
-%belum selesai
+species_skill(charmeleon,15,1,ember).
+species_skill(charmeleon,15,2,fire_spin).
+species_skill(squirtle,5,1,tackle).
+species_skill(squirtle,10,2,water_gun).
+species_skill(wartortle,15,1,water_gun).
+species_skill(wartortle,15,2,bubble).
+species_skill(pidgey,5,1,tackle).
+species_skill(pidgey,10,2,gust).
+species_skill(pikachu,5,1,thunder_shock).
+species_skill(pikachu,10,2,quick_attack).
+species_skill(geodude,5,1,tackle).
+species_skill(geodude,10,2,rock_throw).
+species_skill(snorlax,5,1,tackle).
+species_skill(snorlax,10,2,rest).
+species_skill(articuno,5,1,gust).
+species_skill(articuno,10,2,ice_shard).
 
 
 /*fakta effectiveness(TypeAttack, TypeTarget, Modifier).*/
