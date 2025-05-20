@@ -1,14 +1,15 @@
 % Fakta Dinamis
-dynamic(cell/3).  % cell(X, Y, Isi).
-dynamic(move_left/1).  % jumlah turn tersisa
+:- dynamic(cell/3).  % cell(X, Y, Isi).
+:- dynamic(move_left/1).  % jumlah turn tersisa
+:- dynamic(player_pos/2).
 
 % Membuat Map
 generateMap :-
     retractall(cell(_,_,_)),
-    generate_empty_map,
+    generateMap,
     place_grass,
     place_pokemon,
-    place_player,
+    setPlayer,
     assertz(move_left(20)).
 
 % Memasukkan Pemain di Map
