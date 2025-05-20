@@ -2,8 +2,8 @@
 pokemon(charmander, common, fire, 35, 15, 10, charmeleon, 15).
 pokemon(squirtle, common, water, 40, 12, 15, wartortle, 15).
 pokemon(pidgey, common, flying, 30, 14, 10, none, -1).
-pokemon(charmeleon, common, fire, 57, 26, 21, none, -1).
-pokemon(wartortle, common, water, 62, 23, 26, none, -1).
+pokemon(charmeleon, common, fire, 55, 25, 20, none, -1).
+pokemon(wartortle, common, water, 60, 22, 25, none, -1).
 pokemon(pikachu, rare, electric, 30, 16, 10, none, -1).
 pokemon(geodude, rare, rock, 30, 20, 25, none, -1).
 pokemon(snorlax, epic, 70, 30, 20, none, -1).
