@@ -91,4 +91,38 @@ effectiveness(ice,ice,0.5).
 effectiveness(normal,rock,0.5).
 effectiveness(_,_,1).
 
+/* fakta Pemain */
+:- dynamic player/4.
+
+/* fakta Map, Pokemon Liar yang Tersembunyi, dan Pokemon di Luar Rumput */
+:- dynamic grass/2.
+:- dynamic pokemon_liar/4.
+:- dynamic pokemon_outside/2.
+
+/* fakta ukuran Map */
+size_of_map(8,8).
+
+/* fakta Pokemon (Dinamis) */
+:- dynamic pokemonInstance/6.
+
+/* fakta Party */
+:- dynamic party/1.
+
+/* fakta Storage */
+:- dynamic storage/1.
+
+/* fakta InBattle */
+:- dynamic inBattle/2.
+
+/* fakta Tas/Bag */
+:- dynamic bag/2.
+
+/* fakta Immune Boss */
+:- dynamic immune/2.
+immune(mewtwo, burn).
+immune(mewtwo, paralyze).
+immune(mewtwo, sleep).
+immune(mewtwo, confuse).
+immune(mewtwo, freeze).
+
 /**/
