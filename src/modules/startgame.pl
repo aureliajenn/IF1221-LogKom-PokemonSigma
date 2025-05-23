@@ -2,7 +2,6 @@ initPlayer(Name) :-
     retractall(player_name(_)),
     assertz(player_name(Name)).
 
-
 startGame :-
     write('Masukkan nama pemain: '), nl,
     read(Name),
