@@ -125,4 +125,11 @@ immune(mewtwo, sleep).
 immune(mewtwo, confuse).
 immune(mewtwo, freeze).
 
+/* fakta item(Name,Type,Effect) */
+:- dynamic item/3.
+item(pokeball, ball, catch).
+item(potion, medicine, heal(0.2)).
+item(super_potion, medicine, heal(0.5)).
+item(hyper_potion, medicine, heal(1)).
+
 /**/
