@@ -1,2 +1,19 @@
 :- include('facts.pl'). 
+:- include('src\modules\random.pl').
 
+:- include('src\modules\startgame.pl').
+:- include('src/modules/state.pl').
+:- include('src\modules\bag.pl').
+:- include('src\modules\map.pl').
+:- include('src\modules\move.pl').
+:- include('src\modules\catchpokemon.pl').
+:- include('src\modules\battle.pl').
+:- include('src\modules\attack.pl').
+:- include('src\modules\defend.pl').
+:- include('src\modules\skill.pl').
+:- include('src\modules\setparty.pl').
+:- include('src\modules\bonuslevelup.pl').
+:- include('src\modules\additem.pl').
+:- include('src\modules\useitem.pl').
+:- include('src\modules\superhyperpotion.pl').
+:- include('src\modules\endgame.pl').
