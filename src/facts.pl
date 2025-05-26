@@ -132,4 +132,5 @@ item(potion, medicine, heal(0.2)).
 item(super_potion, medicine, heal(0.5)).
 item(hyper_potion, medicine, heal(1)).
 
-/**/
+/*fakta encountered(Name,HP,ATK,DEF,Level,Exp).*/
+:- dynamic encountered/6.
