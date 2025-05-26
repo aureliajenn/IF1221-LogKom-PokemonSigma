@@ -1,4 +1,3 @@
-:- module(skill, [skill/1]).
 :- dynamic status/3.
 
 skill(Slot) :-

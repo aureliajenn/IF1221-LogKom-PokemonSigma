@@ -1,7 +1,3 @@
-:- module(move, [move/1]).
-:- use_module(bag).
-:- use_module(battle).
-:- use_module(random).
 
 move(Direction) :-
     inBattle(_, _),

@@ -1,5 +1,4 @@
-:- module(bag, [setBag/0, showBag/0, is_slot_empty/1, add_item_to_bag/1]).
-:- use_module(items).
+
 
 setBag :-
     retractall(bag(_, _)),

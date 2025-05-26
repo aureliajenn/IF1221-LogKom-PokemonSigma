@@ -1,8 +1,3 @@
-:- module(attack, [attack/0]).
-:- use_module(battle).
-:- use_module(state).
-:- dynamic(encountered/6).  % jika juga diakses di luar state.pl
-
 % Lookup modifier langsung dari fakta effectiveness
 modifier(AtkType, DefType, Modifier) :-
     effectiveness(AtkType, DefType, Modifier), !.

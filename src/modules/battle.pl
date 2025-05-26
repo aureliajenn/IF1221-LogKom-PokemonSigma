@@ -1,5 +1,3 @@
-:- module(battle, [start_battle/0, end_battle/0]).
-:- use_module(state).  % pastikan state.pl ada dan berisi player_active/1
 :- dynamic(current_battle/2).
 :- dynamic(current_skill/1).
 

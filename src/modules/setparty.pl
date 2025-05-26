@@ -1,4 +1,3 @@
-:- module(party, [setParty/2, showParty/0]).
 
 setParty(IdxParty, IdxBag) :-
     inBattle(_, _),

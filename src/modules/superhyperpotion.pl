@@ -1,11 +1,3 @@
-:- module(items, [
-    use_super_potion/1,
-    use_hyper_potion/1,
-    get_healing_item/1,
-    show_healing_item_info/1
-]).
-
-:- use_module(facts).
 
 use_super_potion(Slot) :-
     use_healing_item(Slot, super_potion).
