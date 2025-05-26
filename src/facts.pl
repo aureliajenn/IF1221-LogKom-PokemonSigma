@@ -18,15 +18,15 @@ rarityValue(legendary,20).
 /*fakta skill(SkillName, Tipe, Power, EfekTambahan).*/
 skill(tackle,normal,35,none).
 skill(scratch, normal, 35, none).
-skill(ember,fire,40,[burn_10_percent, -3_hp_2_turns]).
+skill(ember,fire,40,[minus_3_hp_2_turns]).
 skill(water_gun, water, 40, none).
 skill(gust, flying, 30, none).
-skill(fire_spin, fire, 35, [_,-5_hp_2_turns]).
-skill(bubble, water, 30, []). %butuh rev
-skill(thunder_shock, electric, 40, []). %butuh rev
+skill(fire_spin, fire, 35, [_,minus_5_hp_2_turns]).
+skill(bubble, water, 30, [minus_3_atk_perm]). %butuh rev
+skill(thunder_shock, electric, 40, [failed_atk_20_percent]). %butuh rev
 skill(quick_attack, normal, 30, []). %butuh rev
 skill(rock_throw, rock, 50, none).
-skill(rest, normal, none, []). %butuh rev
+skill(rest, normal, none, [heal_40_percent]). %butuh rev
 skill(ice_shard, ice, 40, []). %butuh rev
 
 /*fakta exp_of_rarity(Rarity, BaseExpRarity).*/
