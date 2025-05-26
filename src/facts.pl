@@ -6,7 +6,7 @@ pokemon(charmeleon, common, fire, 55, 25, 20, none, -1).
 pokemon(wartortle, common, water, 60, 22, 25, none, -1).
 pokemon(pikachu, rare, electric, 30, 16, 10, none, -1).
 pokemon(geodude, rare, rock, 30, 20, 25, none, -1).
-pokemon(snorlax, epic, 70, 30, 20, none, -1).
+pokemon(snorlax, epic, normal 70, 30, 20, none, -1).
 pokemon(articuno, legendary, ice, 60, 28, 35, none, -1).
 
 /*fakta rarityValue(Rarity, Value).*/
