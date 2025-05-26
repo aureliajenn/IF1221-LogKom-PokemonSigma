@@ -3,17 +3,17 @@
 
 :- include('modules/startgame.pl').
 :- include('modules/state.pl').
-:- include('modules/bag.pl').
+:- use_module('modules/bag.pl').
 :- include('modules/map.pl').
-:- include('modules/move.pl').
+:- use_module('modules/move.pl').
 :- include('modules/catchpokemon.pl').
-:- include('modules/battle.pl').
-:- include('modules/attack.pl').
+:- use_module('modules/battle.pl').
+:- use_module('modules/attack.pl').
 :- include('modules/defend.pl').
-:- include('modules/skill.pl').
-:- include('modules/setparty.pl').
+:- use_module('modules/skill.pl').
+:- use_module('modules/setparty.pl').
 :- include('modules/bonuslevelup.pl').
 :- include('modules/additem.pl').
 :- include('modules/useitem.pl').
-:- include('modules/superhyperpotion.pl').
+:- use_module('modules/superhyperpotion.pl').
 :- include('modules/endgame.pl').
