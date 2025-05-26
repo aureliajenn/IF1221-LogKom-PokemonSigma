@@ -10,6 +10,7 @@
 :- use_module('modules/battle.pl').
 :- use_module('modules/attack.pl').
 :- include('modules/defend.pl').
+:- include('modules/run.pl').
 :- use_module('modules/skill.pl').
 :- use_module('modules/setparty.pl').
 :- include('modules/bonuslevelup.pl').
