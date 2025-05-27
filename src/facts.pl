@@ -92,45 +92,45 @@ effectiveness(normal,rock,0.5).
 effectiveness(_,_,1).
 
 /* fakta Pemain */
-:- dynamic player/4.
+:- dynamic(player/4).
 
 /* fakta Map, Pokemon Liar yang Tersembunyi, dan Pokemon di Luar Rumput */
-:- dynamic grass/2.
-:- dynamic pokemon_liar/4.
-:- dynamic pokemon_outside/2.
+:- dynamic(grass/2).
+:- dynamic(pokemon_liar/4).
+:- dynamic(pokemon_outside/2).
 
 /* fakta ukuran Map */
 size_of_map(8,8).
 
 /* fakta Pokemon (Dinamis) */
-:- dynamic pokemonInstance/6.
+:- dynamic(pokemonInstance/6).
 
 /* fakta Party */
-:- dynamic party/1.
+:- dynamic(party/1).
 
 /* fakta Storage */
-:- dynamic storage/1.
+:- dynamic(storage/1).
 
 /* fakta InBattle */
-:- dynamic inBattle/2.
+:- dynamic(inBattle/2).
 
 /* fakta Tas/Bag */
-:- dynamic bag/2.
+:- dynamic(bag/2).
 
 /* fakta Immune Boss */
-:- dynamic immune/2.
-immune(mewtwo,burn).
-immune(mewtwo,paralyze).
-immune(mewtwo,sleep).
-immune(mewtwo,confuse).
-immune(mewtwo,freeze).
+:- dynamic(immune/2).
+immune(mewtwo, burn).
+immune(mewtwo, paralyze).
+immune(mewtwo, sleep).
+immune(mewtwo, confuse).
+immune(mewtwo, freeze).
 
 /* fakta item(Name,Type,Effect) */
-:- dynamic item/3.
-item(pokeball,ball,catch).
-item(potion,medicine,heal(0.2)).
-item(super_potion,medicine,heal(0.5)).
-item(hyper_potion,medicine,heal(1)).
+:- dynamic(item/3).
+item(pokeball, ball, catch).
+item(potion, medicine, heal(0.2)).
+item(super_potion, medicine, heal(0.5)).
+item(hyper_potion, medicine, heal(1)).
 
 /*fakta encountered(Name,HP,ATK,DEF,Level,Exp).*/
-:- dynamic encountered/6.
+:- dynamic(encountered/6).

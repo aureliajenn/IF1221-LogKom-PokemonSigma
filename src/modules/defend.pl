@@ -1,5 +1,5 @@
 %  Tambahan fakta
-:- dynamic isDefending/1.  % isDefending(ID)
+:- dynamic(isDefending/1).  % isDefending(ID)
 
 % Aturan defend: memberikan efek defend ke pokemon player
 defend :-

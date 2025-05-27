@@ -1,5 +1,5 @@
 % Tambahan Fakta
-:- dynamic move_left/1.
+:- dynamic(move_left/1).
 move_left(20).
 
 % Mengecek apakah seluruh pokemon dalam party telah mati

@@ -1,4 +1,4 @@
-:- dynamic status/3.
+:- dynamic(status/3).
 
 skill(Slot) :-
     inBattle(PlayerPokemon, EnemyPokemon),
