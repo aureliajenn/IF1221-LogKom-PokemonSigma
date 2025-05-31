@@ -7,10 +7,10 @@ catch :-
         CatchRate is Base + Rand,
         format('Hasil catch rate: ~w~n', [CatchRate]),
         (CatchRate > 50 ->
-            writeln("Kamu berhasil menangkap pokemon!")
+            writeln("Kamu berhasil menangkap pokemon!"),
         ;
             writeln("Kamu gagal menangkap pokemon!"),
-            write('Persiapkan dirimu! Pertarungan yang epik baru saja dimulai!'), nl
+            write('Persiapkan dirimu! Pertarungan yang epik baru saja dimulai!'), nl,
             start_battle
         )
     ;
