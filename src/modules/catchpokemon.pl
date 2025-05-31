@@ -8,6 +8,7 @@ catch :-
         format('Hasil catch rate: ~w~n', [CatchRate]),
         (CatchRate > 50 ->
             writeln("Kamu berhasil menangkap pokemon!"),
+            store_encountered_pokemon
         ;
             writeln("Kamu gagal menangkap pokemon!"),
             write('Persiapkan dirimu! Pertarungan yang epik baru saja dimulai!'), nl,
