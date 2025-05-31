@@ -11,8 +11,10 @@ is_all_fainted([ID|Rest]) :-
 
 % Rule pertarungan boss
 startBossBattle :-
-    assertz(pokemonInstance(boss001, mewtwo, legendary, 250, 300, 250)),
-    assertz(inBattle(_, mewtwo)),
+    assertz(pokemonInstance(boss001, mewtwo, 20, 250, 300, 250)),
+    assertz(encountered(mewtwo, 250, 300, 250, 20, 0)),
+    party([PlayerMon|_]),
+    assertz(inBattle(PlayerMon, mewtwo)),
     write('Pertarungan melawan Mewtwo dimulai!'), nl.
 
 % Rule utama endGame

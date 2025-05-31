@@ -2,7 +2,7 @@
 :- dynamic(pokemon_liar/4).
 :- dynamic(player_pos/2).
 
-size_of_map(8, 8).
+size_of_map(8,8).
 
 generateMap :-
     retractall(grass(_,_)),

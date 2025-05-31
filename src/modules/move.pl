@@ -58,6 +58,20 @@ decrement_move :-
     assertz(move_left(M1)),
     format('Sisa langkah: ~d~n', [M1]).
 
-check_cell_content(_, _) :-
-    % Implementasi encounter, dsb, sesuai kebutuhan game
-    true.
+check_cell_content(X, Y) :-
+    grass(X, Y),
+    random(0, 100, R),
+    R < 40, % 40% encounter rate
+    !,
+    random_species_by_rarity(common, Species),
+    random_in_range(5, 8, Level),
+    pokemon(Species, Rarity, _, BaseHP, BaseATK, BaseDEF, _, _),
+    HP is BaseHP + Level * 2,
+    ATK is BaseATK + Level,
+    DEF is BaseDEF + Level,
+    Exp is 0,
+    assertz(encountered(Species, HP, ATK, DEF, Level, Exp)),
+    format('Kamu menemukan ~w liar (Lv.~d)!~n', [Species, Level]),
+    start_battle.
+
+check_cell_content(_, _) :- !.
