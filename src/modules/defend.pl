@@ -5,8 +5,6 @@ defend :-
     \+ isDefending(PlayerID),
     assertz(isDefending(PlayerID)),
     write('Pokemon kamu dalam posisi bertahan! Defense naik 30% untuk 1 turn.'), nl,
-    % Lanjut ke giliran musuh (misalnya call rule enemyTurn/0)
-    % enemyTurn,
     !.
 
 defend :-

@@ -16,8 +16,8 @@ move(Direction) :-
     (validate_move(NewX, NewY) ->
         update_player_position(X, Y, NewX, NewY),
         decrement_move,
-        check_cell_content(NewX, NewY),
-        heal_party_pokemon
+        heal_all_pokemon,
+        check_cell_content(NewX, NewY)
     ;
         write('Gagal bergerak! Kamu berada di ujung map.'), nl, fail
     ).
@@ -37,9 +37,10 @@ update_player_position(OldX, OldY, NewX, NewY) :-
     assertz(player_pos(NewX, NewY)),
     format('Berhasil bergerak ke posisi (~d,~d).~n', [NewX, NewY]).
 
-heal_party_pokemon :-
+heal_all_pokemon :-
     party(PokemonList),
-    forall(member(PokemonID, PokemonList), heal_pokemon(PokemonID, 0.2)).
+    forall(member(PokemonID, PokemonList), heal_pokemon(PokemonID, 0.2)),
+    forall(bag(_, pokeball(filled(PokemonID))), heal_pokemon(PokemonID, 0.2)).
 
 heal_pokemon(PokemonID, Factor) :-
     pokemonInstance(PokemonID, Species, Level, CurrentHP, ATK, DEF),
@@ -59,19 +60,13 @@ decrement_move :-
     format('Sisa langkah: ~d~n', [M1]).
 
 check_cell_content(X, Y) :-
-    grass(X, Y),
-    random(0, 100, R),
-    R < 40, % 40% encounter rate
-    !,
-    random_species_by_rarity(common, Species),
-    random_in_range(5, 8, Level),
-    pokemon(Species, Rarity, _, BaseHP, BaseATK, BaseDEF, _, _),
-    HP is BaseHP + Level * 2,
-    ATK is BaseATK + Level,
-    DEF is BaseDEF + Level,
-    Exp is 0,
-    assertz(encountered(Species, HP, ATK, DEF, Level, Exp)),
-    format('Kamu menemukan ~w liar (Lv.~d)!~n', [Species, Level]),
-    start_battle.
+    (pokemon_liar(X, Y, Species, Level) ->
+        interact(X, Y, Species, Level)
+    ; grass(X, Y) ->
+        write('Tidak ada apa-apa di semak ini.'), nl
+    ; true).
 
-check_cell_content(_, _) :- !.
+interact(X, Y, Species, Level) :-
+    format('Kamu bertemu ~w liar (Lv.~d)!~n', [Species, Level]),
+    assertz(encountered(Species, _, _, _, Level, 0)),
+    write('Pilih aksi: battle. / catch. / run.'), nl.

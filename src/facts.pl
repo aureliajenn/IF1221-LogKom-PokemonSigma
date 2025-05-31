@@ -28,6 +28,8 @@ skill(quick_attack, normal, 30, []). %butuh rev
 skill(rock_throw, rock, 50, none).
 skill(rest, normal, none, [heal_40_percent]). %butuh rev
 skill(ice_shard, ice, 40, []). %butuh rev
+skill(psychic_blast, psychic, 25, [confuse_20]).
+skill(mind_shock, psychic, 20, [area_damage, cooldown_2]).
 
 /*fakta exp_of_rarity(Rarity, BaseExpRarity).*/
 exp_of_rarity(common,20).

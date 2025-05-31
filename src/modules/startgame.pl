@@ -1,5 +1,5 @@
 chooseStarterPokemon :-
-    write('Pilih 2 starter Pokémon (hanya common):'), nl,
+    write('Pilih 2 starter Pokémon (hanya common, level 1):'), nl,
     findall(Name, pokemon(Name, common, _, _, _, _, _, _), Commons),
     display_list_with_index(Commons, 0),
     read(Idx1), nth0(Idx1, Commons, Poke1),
@@ -16,7 +16,7 @@ display_list_with_index([H|T], N) :-
 
 initStarterPokemon(Species, ID) :-
     pokemon(Species, Rarity, _, BaseHP, BaseATK, BaseDEF, _, _),
-    Level = 5,
+    Level = 1,
     HP is BaseHP + Level * 2,
     ATK is BaseATK + Level,
     DEF is BaseDEF + Level,
@@ -32,7 +32,6 @@ startGame :-
     read(Name),
     initPlayer(Name),
     generateMap,
-    setPlayer,
     setBag,
     chooseStarterPokemon,
     write('Permainan dimulai! Selamat bermain, '), write(Name), write('!'), nl.

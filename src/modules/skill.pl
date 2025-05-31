@@ -36,7 +36,7 @@ calculate_damage(AttackerID, DefenderID, SkillName, Damage) :-
     pokemon(AttackerSpecies, _, AttackerType, _, _, _, _, _),
     pokemon(DefenderSpecies, _, DefenderType, _, _, _, _, _),
     (effectiveness(Type, DefenderType, Modifier) -> true ; Modifier = 1),
-    Damage is floor((Power * ATK) / (DEF / 5) * Modifier).
+    Damage is floor((Power * ATK) / (DEF * 0.2) * Modifier).
 
 apply_damage(PokemonID, Damage) :-
     pokemonInstance(PokemonID, Species, Level, HP, ATK, DEF),

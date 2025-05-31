@@ -1,12 +1,20 @@
-catchPokemon(Rarity) :-
-    rarityValue(Rarity, Base),
-    random_in_range(0, 36, Rand),
-    CatchRate is Base + Rand,
-    format("CatchRate = ~w + ~w = ~w~n", [Base, Rand, CatchRate]),
-    (CatchRate > 50 ->
-        writeln("🎉 Pokémon berhasil ditangkap!"),
-        store_encountered_pokemon;
-        writeln("💥 Gagal menangkap! Lanjut ke battle.")
+catch :-
+    encountered(Species, _, _, _, _, _),
+    write('Kamu memilih menangkap pokemon'), nl,
+    (find_empty_pokeball_slot(Slot) ->
+        rarityValue(common, Base),
+        random_in_range(0, 36, Rand),
+        CatchRate is Base + Rand,
+        format('Hasil catch rate: ~w~n', [CatchRate]),
+        (CatchRate > 50 ->
+            writeln("Kamu berhasil menangkap pokemon!")
+        ;
+            writeln("Kamu gagal menangkap pokemon!"),
+            write('Persiapkan dirimu! Pertarungan yang epik baru saja dimulai!'), nl
+            start_battle
+        )
+    ;
+        write('Tidak ada pokeball kosong!'), nl
     ).
 
 store_encountered_pokemon :-
@@ -15,12 +23,13 @@ store_encountered_pokemon :-
     assertz(pokemonInstance(ID, Species, Level, HP, ATK, DEF)),
     add_pokemon_to_party_or_bag(ID, Species),
     format("🔴 ~w masuk ke party atau Pokeball!~n", [Species]),
-    retract(encountered(Species, HP, ATK, DEF, Level, Exp)).
+    retract(encountered(Species, HP, ATK, DEF, Level, Exp)),
+    retract(pokemon_liar(_, _, Species, Level)).
 
 add_pokemon_to_party_or_bag(ID, _) :-
     party(Party),
     length(Party, Len),
-    (Len < 6 ->
+    (Len < 4 ->
         retract(party(Party)),
         append(Party, [ID], NewParty),
         assertz(party(NewParty))
