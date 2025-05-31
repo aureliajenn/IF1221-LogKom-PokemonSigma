@@ -1,19 +1,12 @@
-:- dynamic(current_battle/2).
-:- dynamic(current_skill/1).
+:- dynamic(inBattle/2).
 
-% Memulai pertarungan
 start_battle :-
-    player_active(PlayerMon),
+    party([PlayerMon|_]),
     encountered(EnemyName, _, _, _, _, _),
-    assertz(current_battle(PlayerMon, EnemyName)),
-    % Default: pakai skill pertama
-    pokemon(PlayerMon, _, _, _, _, _, Skill1, _),
-    assertz(current_skill(Skill1)),
+    assertz(inBattle(PlayerMon, EnemyName)),
     format("Pertarungan dimulai antara ~w dan ~w!~n", [PlayerMon, EnemyName]).
 
-% Mengakhiri pertarungan dan reset state
 end_battle :-
-    retractall(current_battle(_, _)),
-    retractall(current_skill(_)),
+    retractall(inBattle(_, _)),
     retractall(encountered(_, _, _, _, _, _)),
     write('Pertarungan berakhir.'), nl.

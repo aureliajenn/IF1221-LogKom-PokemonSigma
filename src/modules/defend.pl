@@ -1,14 +1,12 @@
-%  Tambahan fakta
-:- dynamic(isDefending/1).  % isDefending(ID)
+:- dynamic(isDefending/1).
 
-% Aturan defend: memberikan efek defend ke pokemon player
 defend :-
     inBattle(PlayerID, _),
-    \+ isDefending(PlayerID),  % Cegah defend berulang-ulang dalam satu giliran
+    \+ isDefending(PlayerID),
     assertz(isDefending(PlayerID)),
     write('Pokemon kamu dalam posisi bertahan! Defense naik 30% untuk 1 turn.'), nl,
     % Lanjut ke giliran musuh (misalnya call rule enemyTurn/0)
-    enemyTurn,
+    % enemyTurn,
     !.
 
 defend :-
@@ -22,11 +20,9 @@ defend :-
     write('Kamu tidak sedang dalam pertarungan!'), nl,
     !.
 
-% mengecek apakah target sedang defend
 calculateDamage(AttackerID, TargetID, BaseDamage, FinalDamage) :-
     isDefending(TargetID),
-    FinalDamage is round(BaseDamage * 0.7),  % Reduksi 30%
-    retract(isDefending(TargetID)),  % Hanya 1 turn!
-    !.
+    FinalDamage is round(BaseDamage * 0.7),
+    retract(isDefending(TargetID)), !.
 
-calculateDamage(_, _, BaseDamage, BaseDamage).  % Tidak defend
+calculateDamage(_, _, BaseDamage, BaseDamage).

@@ -1,33 +1,27 @@
-% Lookup modifier langsung dari fakta effectiveness
-modifier(AtkType, DefType, Modifier) :-
-    effectiveness(AtkType, DefType, Modifier), !.
-
-
-% Serangan oleh player terhadap Pokémon liar
 attack :-
-    \+ current_battle(_, _),
+    \+ inBattle(_, _),
     write('Tidak ada pertarungan yang sedang berlangsung!'), nl, !.
 
 attack :-
-    current_battle(PlayerMon, EnemyMon),
-    current_skill(Skill),
-    pokemon(PlayerMon, TypeA, _, _, AtkA, _, _, _),
-    encountered(EnemyMon, TypeT, LvlT, HP_T, AtkT, DefT),
-    skill(Skill, TypeSkill, PowerSkill),
-    modifier(TypeSkill, TypeT, Modifier),
-    DamageFloat is ((PowerSkill * AtkA) / (DefT * 5)) * Modifier,
-    Damage is floor(DamageFloat),
-    NewHP is max(0, HP_T - Damage),
-
-    % Update HP musuh liar
-    retract(encountered(EnemyMon, TypeT, LvlT, HP_T, AtkT, DefT)),
-    assertz(encountered(EnemyMon, TypeT, LvlT, NewHP, AtkT, DefT)),
-
-    format("~w menggunakan ~w!~n", [PlayerMon, Skill]),
-    format("~w menerima ~d damage!~n", [EnemyMon, Damage]),
-    format("HP ~w sekarang: ~d~n", [EnemyMon, NewHP]),
-
-    (NewHP =< 0 ->
+    inBattle(PlayerID, EnemyID),
+    % Ambil skill default (misal slot 1)
+    pokemonInstance(PlayerID, Species, Level, _, ATK, _),
+    (species_skill(Species, Level, 1, SkillName) -> true ; SkillName = tackle),
+    skill(SkillName, TypeSkill, PowerSkill, _),
+    pokemonInstance(EnemyID, EnemySpecies, _, _, _, DEF),
+    pokemon(Species, _, TypeA, _, _, _, _, _),
+    pokemon(EnemySpecies, _, TypeT, _, _, _, _, _),
+    (effectiveness(TypeSkill, TypeT, Modifier) -> true ; Modifier = 1),
+    DamageFloat is ((PowerSkill * ATK) / (DEF * 5)) * Modifier,
+    Damage is max(1, floor(DamageFloat)),
+    apply_damage(EnemyID, Damage),
+    format("~w menggunakan ~w!~n", [Species, SkillName]),
+    format("~w menerima ~d damage!~n", [EnemySpecies, Damage]),
+    pokemonInstance(EnemyID, _, _, HPBaru, _, _),
+    format("HP ~w sekarang: ~d~n", [EnemySpecies, HPBaru]),
+    (HPBaru =< 0 ->
         write('Musuh berhasil dikalahkan!'), nl,
-        end_battle
+        retract(inBattle(PlayerID, EnemyID)),
+        % Tambahkan reward/exp dsb di sini
+        true
     ; true).

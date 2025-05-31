@@ -1,3 +1,5 @@
+:- dynamic(player_pos/2).
+:- dynamic(move_left/1).
 
 move(Direction) :-
     inBattle(_, _),
@@ -13,9 +15,9 @@ move(Direction) :-
     calculate_new_pos(X, Y, Direction, NewX, NewY),
     (validate_move(NewX, NewY) ->
         update_player_position(X, Y, NewX, NewY),
-        heal_party_pokemon,
         decrement_move,
-        check_cell_content(NewX, NewY)
+        check_cell_content(NewX, NewY),
+        heal_party_pokemon
     ;
         write('Gagal bergerak! Kamu berada di ujung map.'), nl, fail
     ).
@@ -27,55 +29,35 @@ calculate_new_pos(X, Y, right, NewX, Y) :- NewX is X + 1.
 
 validate_move(X, Y) :-
     size_of_map(MaxX, MaxY),
-    X >= 1, X =< MaxX,
-    Y >= 1, Y =< MaxY.
+    X >= 0, X < MaxX,
+    Y >= 0, Y < MaxY.
 
 update_player_position(OldX, OldY, NewX, NewY) :-
     retract(player_pos(OldX, OldY)),
-    retract(cell(OldX, OldY, player)),
     assertz(player_pos(NewX, NewY)),
-    assertz(cell(NewX, NewY, player)),
-    assertz(cell(OldX, OldY, empty)).
+    format('Berhasil bergerak ke posisi (~d,~d).~n', [NewX, NewY]).
 
 heal_party_pokemon :-
-    write('HP Pokemon dipulihkan sebanyak 20% dari total max HP masing-masing.'), nl,
-    forall(party(PokemonID), heal_pokemon(PokemonID, 0.2)).
+    party(PokemonList),
+    forall(member(PokemonID, PokemonList), heal_pokemon(PokemonID, 0.2)).
 
 heal_pokemon(PokemonID, Factor) :-
     pokemonInstance(PokemonID, Species, Level, CurrentHP, ATK, DEF),
     pokemon(Species, _, _, BaseHP, _, _, _, _),
     MaxHP is BaseHP + (Level * 2),
-    HealAmount is floor(MaxHP * Factor),
-    NewHP is min(MaxHP, CurrentHP + HealAmount),
-    retract(pokemonInstance(PokemonID, Species, Level, _, ATK, DEF)),
-    assertz(pokemonInstance(PokemonID, Species, Level, NewHP, ATK, DEF)).
+    HealAmount is round(MaxHP * Factor),
+    NewHP is min(CurrentHP + HealAmount, MaxHP),
+    retract(pokemonInstance(PokemonID, Species, Level, CurrentHP, ATK, DEF)),
+    assertz(pokemonInstance(PokemonID, Species, Level, NewHP, ATK, DEF)),
+    format('HP ~w bertambah menjadi ~d/~d~n', [PokemonID, NewHP, MaxHP]).
 
 decrement_move :-
-    retract(move_left(Moves)),
-    NewMoves is Moves - 1,
-    assertz(move_left(NewMoves)).
+    move_left(M),
+    M1 is M - 1,
+    retract(move_left(M)),
+    assertz(move_left(M1)),
+    format('Sisa langkah: ~d~n', [M1]).
 
-check_cell_content(X, Y) :-
-    cell(X, Y, grass),
-    random(0, 100, Chance),
-    (Chance < 30 ->
-        random_species_by_rarity(common, Species),
-        random_between(1, 15, Level),
-        write('Kamu menemukan Pokemon liar!'), nl,
-        assertz(pokemon_liar(X, Y, Species, Level)),
-        interact
-    ;
-        write('Kamu memasuki semak-semak!'), nl,
-        write('Sepertinya tidak ada tanda-tanda kehidupan disini...'), nl
-    ).
-
-check_cell_content(X, Y) :-
-    cell(X, Y, common),
-    write('Kamu menemukan Pokemon common di luar rumput!'), nl,
-    interact.
-
-check_cell_content(X, Y) :-
-    cell(X, Y, 'H'),
-    write('Kamu menemukan PokeCenter! Gunakan command heal/0 untuk memulihkan HP.'), nl.
-
-check_cell_content(_, _).
+check_cell_content(_, _) :-
+    % Implementasi encounter, dsb, sesuai kebutuhan game
+    true.

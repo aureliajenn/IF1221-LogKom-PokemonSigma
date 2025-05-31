@@ -134,3 +134,13 @@ item(hyper_potion, medicine, heal(1)).
 
 /*fakta encountered(Name,HP,ATK,DEF,Level,Exp).*/
 :- dynamic(encountered/6).
+
+/*fakta pokemon_id_counter*/
+:- dynamic(pokemon_id_counter/1).
+pokemon_id_counter(1000).
+
+generate_pokemon_id(ID) :-
+    retract(pokemon_id_counter(N)),
+    ID = N,
+    N1 is N + 1,
+    assertz(pokemon_id_counter(N1)).

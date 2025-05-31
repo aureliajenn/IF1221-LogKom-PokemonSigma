@@ -1,4 +1,4 @@
-
+:- dynamic(bag/2).
 
 setBag :-
     retractall(bag(_, _)),
@@ -16,35 +16,27 @@ showBag :-
     write('Slot 00-19: Pokeball'), nl,
     write('Slot 20-39: Item/Kosong'), nl, nl,
     forall(between(0, 39, Index),
-        (bag(Index, Item),
-        format_item(Index, Item))).
+        (bag(Index, Item), format_item(Index, Item))
+    ).
 
 format_item(Index, empty) :-
     format('Slot ~|~`0t~d~2+: [Kosong]~n', [Index]).
 format_item(Index, pokeball(empty)) :-
     format('Slot ~|~`0t~d~2+: Pokeball (Kosong)~n', [Index]).
-format_item(Index, pokeball(filled(_))) :-
-    format('Slot ~|~`0t~d~2+: Pokeball (Terisi)~n', [Index]).
+format_item(Index, pokeball(filled(PokemonID))) :-
+    format('Slot ~|~`0t~d~2+: Pokeball (Terisi oleh ~w)~n', [Index, PokemonID]).
 format_item(Index, Item) :-
-    (current_predicate(item/3), item(Item, Type, _)) -> 
-        format('Slot ~|~`0t~d~2+: ~w (~w)~n', [Index, Item, Type])
-    ;
-        format('Slot ~|~`0t~d~2+: ~w (Item)~n', [Index, Item]).
+    Item \= empty, Item \= pokeball(_),
+    format('Slot ~|~`0t~d~2+: ~w~n', [Index, Item]).
 
-is_slot_empty(Index) :-
-    between(0, 39, Index),
-    bag(Index, empty).
+find_empty_slot(Index) :-
+    between(20, 39, Index),
+    bag(Index, empty), !.
 
 add_item_to_bag(Item) :-
     find_empty_slot(Index),
     retract(bag(Index, empty)),
     assertz(bag(Index, Item)),
-    format('Item ~w ditambahkan ke slot ~w~n', [Item, Index]).
-
-find_empty_slot(Index) :-
-    between(20, 39, Index),
-    bag(Index, empty),
-    !.
-find_empty_slot(_) :-
-    write('Tas penuh! Tidak ada slot kosong.'), nl,
-    fail.
+    format('Item ~w berhasil ditambahkan ke slot ~d.\n', [Item, Index]), !.
+add_item_to_bag(_) :-
+    write('Tas sudah penuh! Tidak bisa menambahkan item baru.\n'), !.

@@ -11,15 +11,31 @@ catchPokemon(Rarity) :-
 
 store_encountered_pokemon :-
     encountered(Species, HP, ATK, DEF, Level, Exp),
-    Instance = pokemonInstance(Species, HP, ATK, DEF, Level, Exp),
-    Pokeball = pokeball(Instance),
-    (
-        bag(Pokeball, Count) ->
-            NewCount is Count + 1,
-            retract(bag(Pokeball, Count)),
-            assertz(bag(Pokeball, NewCount))
-        ;
-            assertz(bag(Pokeball, 1))
-    ),
-    format("🔴 ~w masuk ke Pokeball dan tersimpan dalam tas!~n", [Species]),
-    retract(encountered(Species, HP, ATK, DEF, Level, Exp)).  % clear setelah ditangkap
+    gensym(Species, ID),
+    assertz(pokemonInstance(ID, Species, Level, HP, ATK, DEF)),
+    add_pokemon_to_party_or_bag(ID, Species),
+    format("🔴 ~w masuk ke party atau Pokeball!~n", [Species]),
+    retract(encountered(Species, HP, ATK, DEF, Level, Exp)).
+
+add_pokemon_to_party_or_bag(ID, _) :-
+    party(Party),
+    length(Party, Len),
+    (Len < 6 ->
+        retract(party(Party)),
+        append(Party, [ID], NewParty),
+        assertz(party(NewParty))
+    ;
+        find_empty_pokeball_slot(Slot) ->
+            retract(bag(Slot, pokeball(empty))),
+            assertz(bag(Slot, pokeball(filled(ID))))
+    ;
+        write('Party dan Pokeball penuh! Pokemon masuk ke storage.'), nl,
+        (storage(Storage) -> true ; Storage = []),
+        retractall(storage(_)),
+        append(Storage, [ID], NewStorage),
+        assertz(storage(NewStorage))
+    ).
+
+find_empty_pokeball_slot(Slot) :-
+    between(0, 19, Slot),
+    bag(Slot, pokeball(empty)), !.
