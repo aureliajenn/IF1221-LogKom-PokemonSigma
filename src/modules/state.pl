@@ -3,3 +3,8 @@
 :- dynamic(party/1).
 :- dynamic(pokemonInstance/6).
 :- dynamic(player_name/1).
+:- dynamic(inBattle/2).
+:- dynamic(move_left/1).
+:- dynamic(player_pos/2).
+:- dynamic(bag/2).
+:- dynamic(storage/1).

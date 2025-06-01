@@ -26,15 +26,17 @@ game_loop :-
     write('> '),
     read(Command),
     write('Command dibaca: '), write(Command), nl,
-    (Command == quit), !, write('Keluar dari game.'), nl, halt;
-    (catch(call(Command), E, (write('Error: '), write(E), nl)), fail).
+    (Command == quit -> write('Keluar dari game.'), nl, halt ;
+     (catch(call(Command), E, (write('Error: '), write(E), nl)), fail)),
+    endGame,
+    fail.
 
 quit :- halt.
 
 help :-
     nl, write('=== Daftar Command ==='), nl,
     write('--- Navigasi & Info ---'), nl,
-    write('move(direction).'), nl,
+    write('move(Direction).'), nl,
     write('showMap.'), nl,
     write('showBag.'), nl,
     write('showParty.'), nl,

@@ -39,4 +39,6 @@ startGame :-
     read(Name),
     initPlayer(Name),
     generateMap,
-    setBag.
+    setBag,
+    (retractall(move_left(_)), assertz(move_left(20)) ; true),
+    chooseStarterPokemon.

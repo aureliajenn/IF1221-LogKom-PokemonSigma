@@ -1,5 +1,4 @@
 :- dynamic(move_left/1).
-move_left(20).
 
 is_all_fainted([]).
 is_all_fainted([ID|Rest]) :-
@@ -15,7 +14,7 @@ startBossBattle :-
     write('Pertarungan melawan Mewtwo dimulai!'), nl.
 
 endGame :-
-    move_left(0),
+    move_left(ML), ML =< 0,
     \+ inBattle(_, _),
     write('Sudah 20 langkah. Saatnya melawan boss legendaris!'), nl,
     startBossBattle, !.
