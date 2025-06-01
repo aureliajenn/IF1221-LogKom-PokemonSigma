@@ -15,9 +15,14 @@ showBag :-
     write('=== Isi Tas ==='), nl,
     write('Slot 00-19: Pokeball'), nl,
     write('Slot 20-39: Item/Kosong'), nl, nl,
-    forall(between(0, 39, Index),
-        (bag(Index, Item), format_item(Index, Item))
-    ).
+    show_bag_slots(0, 39).
+
+show_bag_slots(I, Max) :- I > Max, !.
+show_bag_slots(I, Max) :-
+    bag(I, Item),
+    format_item(I, Item),
+    I1 is I + 1,
+    show_bag_slots(I1, Max).
 
 format_item(Index, empty) :-
     format('Slot ~|~`0t~d~2+: [Kosong]~n', [Index]).

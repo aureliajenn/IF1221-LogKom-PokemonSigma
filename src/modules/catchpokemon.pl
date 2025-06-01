@@ -7,10 +7,10 @@ catch :-
         CatchRate is Base + Rand,
         format('Hasil catch rate: ~w~n', [CatchRate]),
         (CatchRate > 50 ->
-            writeln("Kamu berhasil menangkap pokemon!"),
+            write("Kamu berhasil menangkap pokemon!"), nl,
             store_encountered_pokemon
         ;
-            writeln("Kamu gagal menangkap pokemon!"),
+            write("Kamu gagal menangkap pokemon!"), nl,
             write('Persiapkan dirimu! Pertarungan yang epik baru saja dimulai!'), nl,
             start_battle
         )
@@ -20,7 +20,7 @@ catch :-
 
 store_encountered_pokemon :-
     encountered(Species, HP, ATK, DEF, Level, Exp),
-    gensym(Species, ID),
+    generate_pokemon_id(ID),
     assertz(pokemonInstance(ID, Species, Level, HP, ATK, DEF)),
     add_pokemon_to_party_or_bag(ID, Species),
     format("🔴 ~w masuk ke party atau Pokeball!~n", [Species]),

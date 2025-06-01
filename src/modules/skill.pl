@@ -52,11 +52,14 @@ apply_damage(PokemonID, Damage) :-
 
 apply_effect(none, _) :- !.
 apply_effect(Effect, Target) :-
-    is_list(Effect),
+    is_effect_list(Effect),
     !,
     apply_effect_list(Effect, Target).
 apply_effect(Effect, Target) :-
     apply_single_effect(Effect, Target).
+
+is_effect_list([]).
+is_effect_list([_|_]).
 
 apply_effect_list([], _).
 apply_effect_list([H|T], Target) :-

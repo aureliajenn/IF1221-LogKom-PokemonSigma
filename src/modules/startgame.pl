@@ -27,7 +27,7 @@ initStarterPokemon(Species, ID) :-
     HP is BaseHP + Level * 2,
     ATK is BaseATK + Level,
     DEF is BaseDEF + Level,
-    gensym(Species, ID),
+    generate_pokemon_id(ID),
     assertz(pokemonInstance(ID, Species, Level, HP, ATK, DEF)).
 
 initPlayer(Name) :-
@@ -37,10 +37,6 @@ initPlayer(Name) :-
 startGame :-
     write('Masukkan nama pemain: '), nl,
     read(Name),
-    write('DEBUG: Nama diterima'), nl,
     initPlayer(Name),
-    write('DEBUG: Player di-init'), nl,
     generateMap,
-    write('DEBUG: Map dibuat'), nl,
-    setBag,
-    write('DEBUG: Bag di-set'), nl.
+    setBag.

@@ -39,8 +39,24 @@ update_player_position(OldX, OldY, NewX, NewY) :-
 
 heal_all_pokemon :-
     party(PokemonList),
-    forall(member(PokemonID, PokemonList), heal_pokemon(PokemonID, 0.2)),
-    forall(bag(_, pokeball(filled(PokemonID))), heal_pokemon(PokemonID, 0.2)).
+    heal_party_list(PokemonList),
+    heal_bag_pokeballs.
+
+heal_party_list([]).
+heal_party_list([PokemonID|T]) :-
+    heal_pokemon(PokemonID, 0.2),
+    heal_party_list(T).
+
+heal_bag_pokeballs :-
+    heal_bag_pokeballs_loop(0, 19).
+
+heal_bag_pokeballs_loop(I, Max) :- I > Max, !.
+heal_bag_pokeballs_loop(I, Max) :-
+    (bag(I, pokeball(filled(PokemonID))) ->
+        heal_pokemon(PokemonID, 0.2)
+    ; true),
+    I1 is I + 1,
+    heal_bag_pokeballs_loop(I1, Max).
 
 heal_pokemon(PokemonID, Factor) :-
     pokemonInstance(PokemonID, Species, Level, CurrentHP, ATK, DEF),
