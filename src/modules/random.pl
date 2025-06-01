@@ -1,9 +1,20 @@
+nth(0, [H|_], H).
+nth(N, [_|T], Elem) :-
+    N > 0,
+    N1 is N - 1,
+    nth(N1, T, Elem).
+
+deleteg(_, [], []).
+deleteg(Elem, [Elem|T], T) :- !.
+deleteg(Elem, [H|T], [H|Rest]) :-
+    deleteg(Elem, T, Rest).
+
 % random_coord(X, Y)
 % Menghasilkan koordinat acak valid dalam batas peta
 random_coord(X, Y) :-
-    size_of_map(MaxX, MaxY),
-    random(0, MaxX, X),
-    random(0, MaxY, Y).
+    size_of_map(W, H),
+    random_fix(0, W, X),
+    random_fix(0, H, Y).
 
 % random_grass_coord(X, Y)
 % Menghasilkan koordinat yang merupakan petak rumput
@@ -28,4 +39,28 @@ random_species_by_rarity(Rarity, Species) :-
 % random_in_range(Min, Max, Value)
 % Menghasilkan nilai acak Value antara Min (inklusif) dan Max (eksklusif)
 random_in_range(Min, Max, Value) :-
-    random(Min, Max, Value).
+    random_fix(Min, Max, Value).
+
+random_member(X, List) :-
+    length(List, Len),
+    Len > 0,
+    random_fix(1, Len, N),
+    nth(N, List, X).
+
+shuffle([], []).
+shuffle(List, [X|Rest]) :-
+    length(List, Len),
+    Len > 0,
+    random_fix(0, Len, Index),
+    nth(Index, List, X),
+    deleteg(X, List, NewList),
+    shuffle(NewList, Rest).
+
+% random_fix(Low, High, Result)
+% GNU Prolog-compatible random integer in [Low, High)
+random_fix(Min, Max, Result) :-
+    Range is Max - Min,
+    random(RawFloat),
+    Temp is RawFloat * Range,
+    Int is truncate(Temp),
+    Result is Min + Int.

@@ -2,11 +2,18 @@ chooseStarterPokemon :-
     write('Pilih 2 starter Pokémon (hanya common, level 1):'), nl,
     findall(Name, pokemon(Name, common, _, _, _, _, _, _), Commons),
     display_list_with_index(Commons, 0),
-    read(Idx1), nth0(Idx1, Commons, Poke1),
-    read(Idx2), nth0(Idx2, Commons, Poke2),
+    chooseStarterPokemon_input(Commons).
+
+chooseStarterPokemon_input(Commons) :-
+    write('Masukkan indeks starter pertama: '), nl,
+    read(Idx1), nth(Idx1, Commons, Poke1),
+    write('Masukkan indeks starter kedua: '), nl,
+    read(Idx2), nth(Idx2, Commons, Poke2),
     initStarterPokemon(Poke1, ID1),
     initStarterPokemon(Poke2, ID2),
-    assertz(party([ID1, ID2])).
+    assertz(party([ID1, ID2])),
+    player_name(Name),
+    write('Permainan dimulai! Selamat bermain, '), write(Name), write('!'), nl.
 
 display_list_with_index([], _).
 display_list_with_index([H|T], N) :-
@@ -30,8 +37,10 @@ initPlayer(Name) :-
 startGame :-
     write('Masukkan nama pemain: '), nl,
     read(Name),
+    write('DEBUG: Nama diterima'), nl,
     initPlayer(Name),
+    write('DEBUG: Player di-init'), nl,
     generateMap,
+    write('DEBUG: Map dibuat'), nl,
     setBag,
-    chooseStarterPokemon,
-    write('Permainan dimulai! Selamat bermain, '), write(Name), write('!'), nl.
+    write('DEBUG: Bag di-set'), nl.

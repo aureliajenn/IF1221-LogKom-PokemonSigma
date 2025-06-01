@@ -23,11 +23,13 @@ main :-
 
 game_loop :-
     repeat,
-    write('> '), read(Command),
-    (Command == quit ; Command == exit), !, write('Keluar dari game.'), nl;
-    (catch(call(Command), E, (write('Error: '), write(E), nl)), fail),
-    endGame,
-    fail.
+    write('> '),
+    read(Command),
+    write('Command dibaca: '), write(Command), nl,
+    (Command == quit), !, write('Keluar dari game.'), nl, halt;
+    (catch(call(Command), E, (write('Error: '), write(E), nl)), fail).
+
+quit :- halt.
 
 help :-
     nl, write('=== Daftar Command ==='), nl,
@@ -54,4 +56,4 @@ help :-
     write('use_hyper_potion(Slot).'), nl,
     nl,
     write('help.'), nl,
-    write('quit. / exit.'), nl, nl.
+    write('quit.'), nl, nl.

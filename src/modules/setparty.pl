@@ -9,7 +9,7 @@ setParty(IdxParty, IdxBag) :-
     length(PokemonList, PartySize),
     IdxParty < PartySize,
     bag(IdxBag, pokeball(filled(PokemonID))),
-    nth0(IdxParty, PokemonList, CurrentPokemon),
+    nth(IdxParty, PokemonList, CurrentPokemon),
     swap_pokemon(IdxParty, IdxBag, CurrentPokemon, PokemonID),
     showParty.
 

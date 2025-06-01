@@ -4,30 +4,75 @@
 
 size_of_map(8,8).
 
+between(Low, High, Low) :-
+    Low =< High.
+between(Low, High, X) :-
+    Low < High,
+    Low1 is Low + 1,
+    between(Low1, High, X).
+
 generateMap :-
+    write('DEBUG: generateMap mulai'), nl,
     retractall(grass(_,_)),
     retractall(pokemon_liar(_,_,_,_)),
     retractall(player_pos(_,_)),
-    generate_grass(32),
+    write('DEBUG: sebelum generate_grass'), nl,
+    generate_grass(8),
+    % DEBUG: Jumlah rumput dan petak kosong
+    findall((X,Y), grass(X,Y), L), length(L, N), write('DEBUG: Total grass: '), write(N), nl,
+    findall((X,Y), (
+        size_of_map(W, H),
+        W1 is W-1,
+        H1 is H-1,
+        between(0, W1, X),
+        between(0, H1, Y),
+        \+ grass(X, Y)
+    ), Kosong),
+    length(Kosong, Nkosong),
+    write('DEBUG: Petak kosong: '), write(Nkosong), nl,
+    write('DEBUG: sebelum place_player_random'), nl,
     place_player_random,
-    place_pokemon_liar.
+    write('DEBUG: sebelum place_pokemon_liar'), nl,
+    place_pokemon_liar,
+    write('DEBUG: generateMap selesai'), nl.
 
-generate_grass(0) :- !.
 generate_grass(N) :-
-    random_coord(X, Y),
-    \+ grass(X, Y),
-    assertz(grass(X, Y)),
-    N1 is N - 1,
-    generate_grass(N1).
-generate_grass(N) :-
-    generate_grass(N).
+    MaxGrass is 64 - 1 - 19,
+    format('DEBUG: N = ~d, MaxGrass = ~d~n', [N, MaxGrass]),
+    (N > MaxGrass ->
+        write('Jumlah rumput terlalu banyak! Maksimal: '), write(MaxGrass), nl,
+        fail
+    ;
+        size_of_map(W, H),
+        W1 is W - 1,
+        H1 is H - 1,
+        findall((X,Y), (between(0, W1, X), between(0, H1, Y)), AllCoords),
+        shuffle(AllCoords, Shuffled),
+        take_n(N, Shuffled, GrassCoords),
+        forall(member((GX,GY), GrassCoords), assertz(grass(GX, GY)))
+    ).
+
+take_n(0, _, []) :- !.
+take_n(_, [], []) :- !.
+take_n(N, [H|T], [H|Rest]) :-
+    N1 is N-1,
+    take_n(N1, T, Rest).
 
 place_player_random :-
-    repeat,
-    random_coord(X, Y),
-    \+ grass(X, Y),
-    \+ pokemon_liar(X, Y, _, _),
-    assertz(player_pos(X, Y)), !.
+    findall((X, Y), (
+        size_of_map(W, H),
+        W1 is W-1,
+        H1 is H-1,
+        between(0, W1, X),
+        between(0, H1, Y),
+        \+ grass(X, Y),
+        \+ pokemon_liar(X, Y, _, _)
+    ), List),
+    ( List = [] ->
+        write('ERROR: Tidak ada petak kosong untuk player!'), nl, fail
+    ; random_member((PX, PY), List),
+      assertz(player_pos(PX, PY))
+    ).
 
 place_pokemon_liar :-
     place_pokemon_random(legendary, 1, in_grass),
@@ -58,7 +103,7 @@ showMap :-
     size_of_map(W, H),
     player_pos(PX, PY),
     move_left(MoveLeft),
-    format('Sisa langkah: ~d~n', [MoveLeft]),
+    write('Sisa langkah: '), write(MoveLeft), nl,
     show_rows(0, H, W, PX, PY).
 
 show_rows(Y, Height, _, _, _) :-
