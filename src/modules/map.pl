@@ -38,19 +38,21 @@ generateMap :-
 
 generate_grass(N) :-
     MaxGrass is 64 - 1 - 19,
-    format('DEBUG: N = ~d, MaxGrass = ~d~n', [N, MaxGrass]),
-    (N > MaxGrass ->
+    write('DEBUG: N = '), write(N), write(', MaxGrass = '), write(MaxGrass), nl,
+    ( N > MaxGrass ->
         write('Jumlah rumput terlalu banyak! Maksimal: '), write(MaxGrass), nl,
         fail
     ;
-        size_of_map(W, H),
-        W1 is W - 1,
-        H1 is H - 1,
-        findall((X,Y), (between(0, W1, X), between(0, H1, Y)), AllCoords),
-        shuffle(AllCoords, Shuffled),
-        take_n(N, Shuffled, GrassCoords),
-        forall(member((GX,GY), GrassCoords), assertz(grass(GX, GY)))
-    ).
+        true
+    ),
+    size_of_map(W, H),
+    W1 is W - 1,
+    H1 is H - 1,
+    findall((X,Y), (between(0, W1, X), between(0, H1, Y)), AllCoords),
+    shuffle(AllCoords, Shuffled),
+    take_n(N, Shuffled, GrassCoords),
+    forall(member((GX,GY), GrassCoords), assertz(grass(GX, GY))),
+    write('DEBUG: selesai generate_grass'), nl.
 
 take_n(0, _, []) :- !.
 take_n(_, [], []) :- !.
