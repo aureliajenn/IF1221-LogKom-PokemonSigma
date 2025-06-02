@@ -2,27 +2,29 @@
 
 skill(Slot) :-
     inBattle(PlayerPokemon, EnemyPokemon),
-    pokemonInstance(PlayerPokemon, Species, Level, HP, ATK, DEF),
-    species_skill(Species, Level, Slot, SkillName),
-    skill(SkillName, Type, Power, Effect),
-    (has_status(PlayerPokemon, sleep) ->
-        write('Pokemon Anda tertidur dan tidak bisa bergerak!'), nl,
-        retract(status(PlayerPokemon, sleep, Turns)),
-        (Turns > 1 -> 
-            NewTurns is Turns - 1,
-            assertz(status(PlayerPokemon, sleep, NewTurns))
+    pokemonInstance(PlayerPokemon, Species, Level, _, _, _),
+    (species_skill(Species, Level, Slot, SkillName) ->
+        skill(SkillName, _Type, _Power, Effect),  % FIX: hindari singleton warning
+
+        (has_status(PlayerPokemon, sleep) ->
+            write('Pokemon Anda tertidur dan tidak bisa bergerak!'), nl,
+            retract(status(PlayerPokemon, sleep, Turns)),
+            (Turns > 1 -> 
+                NewTurns is Turns - 1,
+                assertz(status(PlayerPokemon, sleep, NewTurns))
+            ; true),
+            enemy_turn(EnemyPokemon, PlayerPokemon)
         ;
-            true
-        ),
-        enemy_turn(EnemyPokemon, PlayerPokemon)
+            calculate_damage(PlayerPokemon, EnemyPokemon, SkillName, Damage),
+            apply_damage(EnemyPokemon, Damage),
+            format('~w menggunakan skill "~w"!~n', [Species, SkillName]),
+            format('~w menghasilkan damage sebesar ~w.~n', [Species, Damage]),
+            apply_effect(Effect, EnemyPokemon),
+            write('(Giliran monster lawan.)'), nl,
+            enemy_turn(EnemyPokemon, PlayerPokemon)
+        )
     ;
-        calculate_damage(PlayerPokemon, EnemyPokemon, SkillName, Damage),
-        apply_damage(EnemyPokemon, Damage),
-        format('~w menggunakan skill "~w"!~n', [Species, SkillName]),
-        format('~w menghasilkan damage sebesar ~w.~n', [Species, Damage]),
-        apply_effect(Effect, EnemyPokemon),
-        write('(Giliran monster lawan.)'), nl,
-        enemy_turn(EnemyPokemon, PlayerPokemon)
+        write('Skill tidak tersedia pada slot tersebut.'), nl, fail
     ).
 
 skill(_) :-
@@ -35,8 +37,9 @@ calculate_damage(AttackerID, DefenderID, SkillName, Damage) :-
     skill(SkillName, Type, Power, _),
     pokemon(AttackerSpecies, _, AttackerType, _, _, _, _, _),
     pokemon(DefenderSpecies, _, DefenderType, _, _, _, _, _),
-    (effectiveness(Type, DefenderType, Modifier) -> true ; Modifier = 1),
-    Damage is floor((Power * ATK) / (DEF * 0.2) * Modifier).
+    (effectiveness(Type, DefenderType, TypeModifier) -> true ; TypeModifier = 1),
+    (AttackerType == Type -> STAB = 1.5 ; STAB = 1),
+    Damage is floor((Power * ATK) / (DEF * 0.2) * TypeModifier * STAB).
 
 apply_damage(PokemonID, Damage) :-
     pokemonInstance(PokemonID, Species, Level, HP, ATK, DEF),
@@ -44,7 +47,8 @@ apply_damage(PokemonID, Damage) :-
     (NewHP =< 0 ->
         retract(pokemonInstance(PokemonID, Species, Level, _, ATK, DEF)),
         assertz(pokemonInstance(PokemonID, Species, Level, 0, ATK, DEF)),
-        format('~w telah dikalahkan!~n', [Species])
+        format('~w telah dikalahkan!~n', [Species]),
+        move_defeated_to_bag(PokemonID)
     ;
         retract(pokemonInstance(PokemonID, Species, Level, _, ATK, DEF)),
         assertz(pokemonInstance(PokemonID, Species, Level, NewHP, ATK, DEF))

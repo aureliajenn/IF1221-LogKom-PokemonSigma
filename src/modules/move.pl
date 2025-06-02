@@ -1,5 +1,8 @@
 :- dynamic(player_pos/2).
 :- dynamic(move_left/1).
+:- dynamic(inBattle/2).
+:- dynamic(pokemonInstance/6).
+:- dynamic(party/1).
 
 move(Direction) :-
     inBattle(_, _),
@@ -16,10 +19,10 @@ move(Direction) :-
     (validate_move(NewX, NewY) ->
         update_player_position(X, Y, NewX, NewY),
         decrement_move,
-        heal_all_pokemon,
-        check_cell_content(NewX, NewY)
+        check_cell_content(NewX, NewY),
+        showMap, nl, !
     ;
-        write('Gagal bergerak! Kamu berada di ujung map.'), nl, fail
+        write('Gagal bergerak! Kamu berada di ujung map.'), nl, !, fail
     ).
 
 calculate_new_pos(X, Y, up, X, NewY) :- NewY is Y - 1.
@@ -37,37 +40,6 @@ update_player_position(OldX, OldY, NewX, NewY) :-
     assertz(player_pos(NewX, NewY)),
     format('Berhasil bergerak ke posisi (~d,~d).~n', [NewX, NewY]).
 
-heal_all_pokemon :-
-    party(PokemonList),
-    heal_party_list(PokemonList),
-    heal_bag_pokeballs.
-
-heal_party_list([]).
-heal_party_list([PokemonID|T]) :-
-    heal_pokemon(PokemonID, 0.2),
-    heal_party_list(T).
-
-heal_bag_pokeballs :-
-    heal_bag_pokeballs_loop(0, 19).
-
-heal_bag_pokeballs_loop(I, Max) :- I > Max, !.
-heal_bag_pokeballs_loop(I, Max) :-
-    (bag(I, pokeball(filled(PokemonID))) ->
-        heal_pokemon(PokemonID, 0.2)
-    ; true),
-    I1 is I + 1,
-    heal_bag_pokeballs_loop(I1, Max).
-
-heal_pokemon(PokemonID, Factor) :-
-    pokemonInstance(PokemonID, Species, Level, CurrentHP, ATK, DEF),
-    pokemon(Species, _, _, BaseHP, _, _, _, _),
-    MaxHP is BaseHP + (Level * 2),
-    HealAmount is round(MaxHP * Factor),
-    NewHP is min(CurrentHP + HealAmount, MaxHP),
-    retract(pokemonInstance(PokemonID, Species, Level, CurrentHP, ATK, DEF)),
-    assertz(pokemonInstance(PokemonID, Species, Level, NewHP, ATK, DEF)),
-    format('HP ~w bertambah menjadi ~d/~d~n', [PokemonID, NewHP, MaxHP]).
-
 decrement_move :-
     move_left(M),
     M1 is M - 1,
@@ -77,12 +49,63 @@ decrement_move :-
 
 check_cell_content(X, Y) :-
     (pokemon_liar(X, Y, Species, Level) ->
-        interact(X, Y, Species, Level)
+        interact(X, Y, Species, Level), !
     ; grass(X, Y) ->
-        write('Tidak ada apa-apa di semak ini.'), nl
+        write('Tidak ada apa-apa di semak ini.'), nl, !
     ; true).
 
 interact(X, Y, Species, Level) :-
     format('Kamu bertemu ~w liar (Lv.~d)!~n', [Species, Level]),
-    assertz(encountered(Species, _, _, _, Level, 0)),
+    generate_pokemon_id(EnemyID),
+    pokemon(Species, Rarity, _, BaseHP, BaseATK, BaseDEF, _, _),
+    HP is BaseHP + Level * 2,
+    ATK is BaseATK + Level,
+    DEF is BaseDEF + Level,
+    assertz(pokemonInstance(EnemyID, Species, Level, HP, ATK, DEF)),
+    assertz(temp_enemy_id(EnemyID)),
+    assertz(encountered(Species, Rarity, BaseHP, BaseATK, Level, 0)),
+    party([First|_]),
+    assertz(inBattle(First, EnemyID)),
     write('Pilih aksi: battle. / catch. / run.'), nl.
+
+switch_active_pokemon(NewPlayerID) :-
+    inBattle(_, EnemyID),
+    retractall(inBattle(_, _)),
+    assertz(inBattle(NewPlayerID, EnemyID)).
+
+get_alive_party(List) :-
+    findall(ID, (party(Party), member(ID, Party), pokemonInstance(ID, _, _, HP, _, _), HP > 0), List).
+
+print_pokemon_list([], _).
+print_pokemon_list([ID|T], Index) :-
+    pokemonInstance(ID, Species, Level, HP, ATK, DEF),
+    format('~d. ~w (Lv ~d, HP: ~d, ATK: ~d, DEF: ~d)~n', [Index, Species, Level, HP, ATK, DEF]),
+    NextIndex is Index + 1,
+    print_pokemon_list(T, NextIndex).
+
+handle_fainted_player(PlayerID, EnemyID) :-
+    get_alive_party(AliveList),
+    exclude_custom(=(PlayerID), AliveList, Remaining),
+    (Remaining == [] ->
+        write('Semua Pokemonmu sudah kalah. Kamu kalah total.'), nl,
+        retract(inBattle(PlayerID, EnemyID))
+    ;
+        write('Pokemonmu telah dikalahkan!'), nl,
+        write('Silakan pilih Pokemon pengganti:'), nl,
+        print_pokemon_list(Remaining, 1),
+        write('Masukkan indeks: '), read(Index),
+        Index0 is Index - 1,
+        nth0(Index0, Remaining, NewPlayerID),
+        switch_active_pokemon(NewPlayerID),
+        write('Pokemon telah diganti. Pertarungan dilanjutkan!'), nl,
+        enemy_turn(EnemyID, NewPlayerID)
+    ).
+
+exclude_custom(_, [], []).
+exclude_custom(Pred, [H|T], Result) :-
+    ( call(Pred, H) ->
+        exclude_custom(Pred, T, Result)
+    ;
+        Result = [H|Rest],
+        exclude_custom(Pred, T, Rest)
+    ).

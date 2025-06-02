@@ -1,14 +1,20 @@
-chooseStarterPokemon :-
+:- dynamic(move_left/1).
+
+chooseStarterPokemon :- 
     write('Pilih 2 starter Pokémon (hanya common, level 1):'), nl,
     findall(Name, pokemon(Name, common, _, _, _, _, _, _), Commons),
-    display_list_with_index(Commons, 0),
+    display_list_with_index(Commons, 1),  % Mulai dari 1
     chooseStarterPokemon_input(Commons).
 
 chooseStarterPokemon_input(Commons) :-
     write('Masukkan indeks starter pertama: '), nl,
-    read(Idx1), nth(Idx1, Commons, Poke1),
+    read(Idx1),
     write('Masukkan indeks starter kedua: '), nl,
-    read(Idx2), nth(Idx2, Commons, Poke2),
+    read(Idx2),
+    Index1 is Idx1 - 1,
+    Index2 is Idx2 - 1,
+    nth0(Index1, Commons, Poke1),
+    nth0(Index2, Commons, Poke2),
     initStarterPokemon(Poke1, ID1),
     initStarterPokemon(Poke2, ID2),
     assertz(party([ID1, ID2])),
@@ -35,10 +41,14 @@ initPlayer(Name) :-
     assertz(player_name(Name)).
 
 startGame :-
-    write('Masukkan nama pemain: '), nl,
+    write('Masukkan nama pemain: '),
     read(Name),
-    initPlayer(Name),
-    generateMap,
-    setBag,
-    (retractall(move_left(_)), assertz(move_left(20)) ; true),
-    chooseStarterPokemon.
+    assertz(player_name(Name)),
+    assertz(move_left(20)),  % inisialisasi langkah
+    setBag,                  % ← ganti dari initBag ke setBag
+    chooseStarterPokemon,
+    ( generateMap -> 
+        write('Game berhasil dimulai untuk pemain '), write(Name), nl
+    ; write('Gagal menginisialisasi peta!'), nl
+    ).
+

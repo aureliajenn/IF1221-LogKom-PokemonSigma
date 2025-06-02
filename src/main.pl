@@ -41,6 +41,7 @@ help :-
     write('showBag.'), nl,
     write('showParty.'), nl,
     write('setParty(IdxParty,IdxBag).'), nl,
+    
     nl,
     write('--- Encounter (saat bertemu pokemon liar) ---'), nl,
     write('battle.'), nl,

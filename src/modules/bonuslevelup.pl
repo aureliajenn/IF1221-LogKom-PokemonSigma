@@ -1,29 +1,33 @@
-expForNextLevel(Rarity, LevelNow, EXPNeeded) :-
-    exp_of_rarity(Rarity, BaseExp),
-    EXPNeeded is BaseExp * LevelNow.
+:- dynamic(pokemonInstance/7).
 
-levelUp(Species, NewLevel, BaseLevel, new_stats(NewHP, NewATK, NewDEF)) :-
-    IncLevel is NewLevel - BaseLevel,
-    pokemon(Species, _, _, BaseHP, BaseATK, BaseDEF, _, _),
-    NewHP is BaseHP + NewLevel * 2,
-    NewATK is BaseATK + NewLevel,
-    NewDEF is BaseDEF + NewLevel.
+% Saat Pokemon didapat atau dibuat:
+% assertz(pokemonInstance(ID, Species, Level, HP, ATK, DEF, 0)).
 
-evolusi(LastSpecies, NewSpecies) :-
-    pokemon(LastSpecies, _, _, _, _, _, NewSpecies, EvolveLevel),
-    NewSpecies \= none,
-    EvolveLevel > 0.
+add_exp(ID, AddEXP) :-
+    pokemonInstance(ID, Species, Level, HP, ATK, DEF, CurExp),
+    NewEXP is CurExp + AddEXP,
+    retract(pokemonInstance(ID, Species, Level, HP, ATK, DEF, CurExp)),
+    assertz(pokemonInstance(ID, Species, Level, HP, ATK, DEF, NewEXP)).
 
-canEvolveAtLevel(Species, Level) :-
-    pokemon(Species, _, _, _, _, _, NewSpecies, EvolveLevel),
-    NewSpecies \= none,
-    Level >= EvolveLevel.
+try_level_up(ID) :-
+    pokemonInstance(ID, Species, LevelNow, HP, ATK, DEF, EXP),
+    pokemon(Species, Rarity, _, _, _, _, _, _),
+    expForNextLevel(Rarity, LevelNow, EXPNeeded),
+    EXP >= EXPNeeded,
+    NewEXP is EXP - EXPNeeded,
+    NewLevel is LevelNow + 1,
 
-levelUpInstance(ID, NewLevel) :-
-    pokemonInstance(ID, Species, _, _, _, _),
-    pokemon(Species, _, _, BaseHP, BaseATK, BaseDEF, _, _),
-    NewHP is BaseHP + NewLevel * 2,
-    NewATK is BaseATK + NewLevel,
-    NewDEF is BaseDEF + NewLevel,
-    retract(pokemonInstance(ID, Species, _, _, _, _)),
-    assertz(pokemonInstance(ID, Species, NewLevel, NewHP, NewATK, NewDEF)).
+    levelUp(Species, NewLevel, LevelNow, new_stats(NewHP, NewATK, NewDEF)),
+    retract(pokemonInstance(ID, Species, LevelNow, HP, ATK, DEF, EXP)),
+    assertz(pokemonInstance(ID, Species, NewLevel, NewHP, NewATK, NewDEF, NewEXP)),
+    format('🎉 %w naik ke level ~d!~n', [Species, NewLevel]),
+
+    (canEvolveAtLevel(Species, NewLevel),
+     evolusi(Species, EvolvedSpecies) ->
+        retract(pokemonInstance(ID, _, NewLevel, NewHP, NewATK, NewDEF, NewEXP)),
+        assertz(pokemonInstance(ID, EvolvedSpecies, NewLevel, NewHP, NewATK, NewDEF, NewEXP)),
+        format('🧬 %w berevolusi menjadi %w!~n', [Species, EvolvedSpecies])
+    ; true),
+
+    try_level_up(ID).  % lanjutkan jika masih bisa level up
+try_level_up(_) :- true.  % berhenti jika tidak cukup EXP

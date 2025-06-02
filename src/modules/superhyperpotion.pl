@@ -14,8 +14,14 @@ use_healing_item(Slot, Item) :-
     assertz(bag(Slot, empty)),
     format('~w digunakan. Slot ~d kini kosong.~n', [Item, Slot]), !.
 
-use_healing_item(_, _) :-
-    write('Slot tidak valid atau bukan item healing yang valid.'), nl,
+use_healing_item(Slot, _) :-
+    (\+ integer(Slot) ; \+ between(20, 39, Slot)),
+    write('Slot harus berupa angka antara 20 sampai 39.'), nl,
+    fail.
+
+use_healing_item(Slot, Item) :-
+    \+ bag(Slot, Item),
+    format('Slot ~d tidak berisi ~w atau kosong.~n', [Slot, Item]), nl,
     fail.
 
 apply_healing_effect(Factor) :-
@@ -35,4 +41,4 @@ heal_pokemon(PokemonID, Factor) :-
     NewHP is min(CurrentHP + HealAmount, MaxHP),
     retract(pokemonInstance(PokemonID, Species, Level, CurrentHP, ATK, DEF)),
     assertz(pokemonInstance(PokemonID, Species, Level, NewHP, ATK, DEF)),
-    format('HP ~w bertambah menjadi ~d/~d~n', [PokemonID, NewHP, MaxHP]).
+    format('HP ~w (~w) bertambah menjadi ~d/~d~n', [PokemonID, Species, NewHP, MaxHP]).
