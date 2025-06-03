@@ -20,16 +20,18 @@ endGame :-
     startBossBattle, !.
 
 endGame :-
-    party(Party),
-    is_all_fainted(Party),
-    write('Semua Pokémon milikmu sudah tidak bisa bertarung...'), nl,
-    write('Kamu kalah. Permainan selesai.'), nl,
-    halt, !.
-
-endGame :-
     inBattle(_, mewtwo),
     \+ pokemonInstance(_, mewtwo, _, _, _, _),
     write('Selamat! Kamu telah mengalahkan Mewtwo dan memenangkan permainan!'), nl,
     halt, !.
 
+endGame :-
+    party(Party),
+    is_all_fainted(Party),
+    inBattle(_, mewtwo),
+    write('Semua Pokémon milikmu sudah tidak bisa bertarung...'), nl,
+    write('Kamu kalah. Permainan selesai.'), nl,
+    halt, !.
+
 endGame :- true.
+

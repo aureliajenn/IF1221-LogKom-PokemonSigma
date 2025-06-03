@@ -11,7 +11,8 @@ move(Direction) :-
 move(Direction) :-
     move_left(Moves),
     Moves =< 0,
-    write('Permainan sudah berakhir!'), nl, !, fail.
+    write('Langkah sudah habis. Memeriksa kondisi akhir permainan...'), nl,
+    endGame, !, fail.
 
 move(Direction) :-
     player_pos(X, Y),
@@ -64,14 +65,27 @@ interact(X, Y, Species, Level) :-
     assertz(pokemonInstance(EnemyID, Species, Level, HP, ATK, DEF)),
     assertz(temp_enemy_id(EnemyID)),
     assertz(encountered(Species, Rarity, BaseHP, BaseATK, Level, 0)),
-    party([First|_]),
-    assertz(inBattle(First, EnemyID)),
     write('Pilih aksi: battle. / catch. / run.'), nl.
 
-switch_active_pokemon(NewPlayerID) :-
-    inBattle(_, EnemyID),
-    retractall(inBattle(_, _)),
-    assertz(inBattle(NewPlayerID, EnemyID)).
+switch_active_pokemon(NewPlayerIdx) :-
+    inBattle(CurrentID, EnemyID),
+    party(Party),
+    length(Party, Len),
+    Index0 is NewPlayerIdx - 1,  % FIXED
+    (Index0 < 0 ; Index0 >= Len ->
+        write('Indeks tidak valid.'), nl, fail
+    ;
+        nth0(Index0, NewID, Party),
+        pokemonInstance(NewID, Species, _, HP, _, _),
+        (HP =< 0 ->
+            write('Pokemon itu sudah pingsan dan tidak bisa digunakan!'), nl, fail
+        ;
+            retract(inBattle(_, _)),
+            assertz(inBattle(NewID, EnemyID)),
+            format('Pokemon aktif diganti menjadi ~w!~n', [Species])
+        )
+    ).
+
 
 get_alive_party(List) :-
     findall(ID, (party(Party), member(ID, Party), pokemonInstance(ID, _, _, HP, _, _), HP > 0), List).
@@ -94,12 +108,17 @@ handle_fainted_player(PlayerID, EnemyID) :-
         write('Silakan pilih Pokemon pengganti:'), nl,
         print_pokemon_list(Remaining, 1),
         write('Masukkan indeks: '), read(Index),
-        Index0 is Index - 1,
-        nth0(Index0, Remaining, NewPlayerID),
-        switch_active_pokemon(NewPlayerID),
-        write('Pokemon telah diganti. Pertarungan dilanjutkan!'), nl,
-        enemy_turn(EnemyID, NewPlayerID)
+        length(Remaining, Len),
+        (Index >= 1, Index =< Len ->
+            nth1(Index, Remaining, NewPlayerID),
+            switch_active_pokemon(NewPlayerID),
+            write('Pokemon telah diganti. Pertarungan dilanjutkan!'), nl,
+            enemy_turn(EnemyID, NewPlayerID)
+        ;
+            write('Indeks tidak valid.'), nl, fail
+        )
     ).
+
 
 exclude_custom(_, [], []).
 exclude_custom(Pred, [H|T], Result) :-

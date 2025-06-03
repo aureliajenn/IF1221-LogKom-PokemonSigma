@@ -58,5 +58,10 @@ help :-
     write('use_super_potion(Slot).'), nl,
     write('use_hyper_potion(Slot).'), nl,
     nl,
+
+    write('--- Ganti Current Pokemon ---'), nl,
+    write('switch_active_pokemon(Index).'),
+    nl,
+
     write('help.'), nl,
     write('quit.'), nl, nl.
