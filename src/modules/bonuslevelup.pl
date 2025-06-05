@@ -20,7 +20,7 @@ try_level_up(ID) :-
     levelUp(Species, NewLevel, LevelNow, new_stats(NewHP, NewATK, NewDEF)),
     retract(pokemonInstance(ID, Species, LevelNow, HP, ATK, DEF, EXP)),
     assertz(pokemonInstance(ID, Species, NewLevel, NewHP, NewATK, NewDEF, NewEXP)),
-    format('🎉 %w naik ke level ~d!~n', [Species, NewLevel]),
+    format('%w naik ke level ~d!~n', [Species, NewLevel]),
 
     (canEvolveAtLevel(Species, NewLevel),
      evolusi(Species, EvolvedSpecies) ->

@@ -18,7 +18,7 @@ defend :-
     write('Kamu tidak sedang dalam pertarungan!'), nl,
     !.
 
-calculateDamage(AttackerID, TargetID, BaseDamage, FinalDamage) :-
+calculateDamage(_, TargetID, BaseDamage, FinalDamage) :-
     isDefending(TargetID),
     FinalDamage is round(BaseDamage * 0.7),
     retract(isDefending(TargetID)), !.

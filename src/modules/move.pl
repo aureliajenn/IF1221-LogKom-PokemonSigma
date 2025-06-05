@@ -3,6 +3,8 @@
 :- dynamic(inBattle/2).
 :- dynamic(pokemonInstance/6).
 :- dynamic(party/1).
+:- dynamic(active_pokemon/1).
+
 
 move(Direction) :-
     inBattle(_, _),
@@ -20,11 +22,13 @@ move(Direction) :-
     (validate_move(NewX, NewY) ->
         update_player_position(X, Y, NewX, NewY),
         decrement_move,
+        heal_all_pokemon_20_percent,
         check_cell_content(NewX, NewY),
         showMap, nl, !
     ;
         write('Gagal bergerak! Kamu berada di ujung map.'), nl, !, fail
     ).
+
 
 calculate_new_pos(X, Y, up, X, NewY) :- NewY is Y - 1.
 calculate_new_pos(X, Y, down, X, NewY) :- NewY is Y + 1.
@@ -45,8 +49,8 @@ decrement_move :-
     move_left(M),
     M1 is M - 1,
     retract(move_left(M)),
-    assertz(move_left(M1)),
-    format('Sisa langkah: ~d~n', [M1]).
+    assertz(move_left(M1)).
+    % format('Sisa langkah: ~d~n', [M1]).
 
 check_cell_content(X, Y) :-
     (pokemon_liar(X, Y, Species, Level) ->
@@ -68,23 +72,49 @@ interact(X, Y, Species, Level) :-
     write('Pilih aksi: battle. / catch. / run.'), nl.
 
 switch_active_pokemon(NewPlayerIdx) :-
-    inBattle(CurrentID, EnemyID),
     party(Party),
     length(Party, Len),
-    Index0 is NewPlayerIdx - 1,  % FIXED
+    Index0 is NewPlayerIdx - 1,
     (Index0 < 0 ; Index0 >= Len ->
         write('Indeks tidak valid.'), nl, fail
     ;
-        nth0(Index0, NewID, Party),
+        nth0(Index0, Party, NewID),
         pokemonInstance(NewID, Species, _, HP, _, _),
         (HP =< 0 ->
             write('Pokemon itu sudah pingsan dan tidak bisa digunakan!'), nl, fail
         ;
-            retract(inBattle(_, _)),
-            assertz(inBattle(NewID, EnemyID)),
-            format('Pokemon aktif diganti menjadi ~w!~n', [Species])
+            (
+                % Cek apakah sudah aktif
+                (inBattle(CurrentID, _) ; active_pokemon(CurrentID)) ->
+                    (CurrentID == NewID ->
+                        format('Pokemon ~w sedang digunakan!~n', [Species]), fail
+                    ;
+                        (
+                            inBattle(_, EnemyID) ->
+                                retractall(inBattle(_, _)),
+                                assertz(inBattle(NewID, EnemyID))
+                            ;
+                                retractall(active_pokemon(_)),
+                                assertz(active_pokemon(NewID))
+                        ),
+                        format('Pokemon aktif diganti menjadi ~w!~n', [Species])
+                    )
+                ;
+                    % Jika tidak ada yang aktif (fallback)
+                    (
+                        inBattle(_, EnemyID) ->
+                            retractall(inBattle(_, _)),
+                            assertz(inBattle(NewID, EnemyID))
+                        ;
+                            retractall(active_pokemon(_)),
+                            assertz(active_pokemon(NewID))
+                    ),
+                    format('Pokemon aktif diganti menjadi ~w!~n', [Species])
+            )
         )
     ).
+
+
 
 
 get_alive_party(List) :-
@@ -127,4 +157,39 @@ exclude_custom(Pred, [H|T], Result) :-
     ;
         Result = [H|Rest],
         exclude_custom(Pred, T, Rest)
+    ).
+
+% Fungsi utama: menyembuhkan semua Pokemon dalam party dan pokeball
+heal_all_pokemon_20_percent :-
+    heal_party_pokemons,
+    heal_bag_pokemons.
+
+% Menyembuhkan semua Pokemon dalam party
+heal_party_pokemons :-
+    party(PokemonList),
+    forall(member(PokemonID, PokemonList), heal_if_needed(PokemonID)).
+
+% Menyembuhkan semua Pokemon dalam pokeball
+heal_bag_pokemons :-
+    forall(
+        (bag(Slot, pokeball(filled(PokemonID))),
+         pokemonInstance(PokemonID, _, _, _, _, _)),
+        heal_if_needed(PokemonID)
+    ).
+
+% Menyembuhkan 20% HP jika belum penuh
+heal_if_needed(PokemonID) :-
+    pokemonInstance(PokemonID, Species, Level, HP, ATK, DEF),
+    pokemon(Species, _, _, BaseHP, _, _, _, _),
+    MaxHP is BaseHP + (Level * 2),
+    (HP < MaxHP ->
+        Heal is round(MaxHP * 0.2),
+        TempHP is HP + Heal,
+        NewHP is min(TempHP, MaxHP),
+        retract(pokemonInstance(PokemonID, Species, Level, HP, ATK, DEF)),
+        assertz(pokemonInstance(PokemonID, Species, Level, NewHP, ATK, DEF)),
+        write('HP Pokemon dipulihkan sebanyak 20% dari total max HP masing-masing.'), nl,  % (opsional, sesuai spesifikasi)
+        format('HP ~w bertambah menjadi ~d/~d~n', [Species, NewHP, MaxHP])
+    ;
+        true  % tidak ada output jika HP sudah penuh
     ).

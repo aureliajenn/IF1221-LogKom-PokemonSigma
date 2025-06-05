@@ -8,6 +8,7 @@ pokemon(pikachu, rare, electric, 30, 16, 10, none, -1).
 pokemon(geodude, rare, rock, 30, 20, 25, none, -1).
 pokemon(snorlax, epic, normal, 70, 30, 20, none, -1).
 pokemon(articuno, legendary, ice, 60, 28, 35, none, -1).
+pokemon(mewtwo, legendary, psychic, 250, 300, 250, none, none).
 
 /*fakta rarityValue(Rarity, Value).*/
 rarityValue(common,40).
@@ -44,24 +45,26 @@ exp_given_rarity(epic,30).
 exp_given_rarity(legendary,40).
 
 /*fakta skill slot species_skill(Species, Level, SkillSlot, SkillName).*/
-species_skill(charmander,1,1,scratch).
-species_skill(charmander,5,2,ember).
-species_skill(charmeleon,10,1,ember).
-species_skill(charmeleon,10,2,fire_spin).
-species_skill(squirtle,1,1,tackle).
-species_skill(squirtle,5,2,water_gun).
-species_skill(wartortle,5,1,water_gun).
-species_skill(wartortle,10,2,bubble).
-species_skill(pidgey,1,1,tackle).
-species_skill(pidgey,5,2,gust).
-species_skill(pikachu,1,1,thunder_shock).
-species_skill(pikachu,5,2,quick_attack).
-species_skill(geodude,1,1,tackle).
-species_skill(geodude,5,2,rock_throw).
-species_skill(snorlax,1,1,tackle).
-species_skill(snorlax,5,2,rest).
-species_skill(articuno,1,1,gust).
-species_skill(articuno,5,2,ice_shard).
+species_skill(charmander,L,1,scratch) :- L >= 1.
+species_skill(charmander,L,2,ember):- L >= 5.
+species_skill(charmeleon,L,1,ember) :- L >= 10.
+species_skill(charmeleon,L,2,fire_spin) :- L >= 10.
+species_skill(squirtle,L,1,tackle) :- L >= 1.
+species_skill(squirtle,L,2,water_gun) :- L >= 5.
+species_skill(wartortle,L,1,water_gun) :- L >= 5.
+species_skill(wartortle,L,2,bubble) :- L >= 10.
+species_skill(pidgey,L,1,tackle) :- L >= 1.
+species_skill(pidgey,L,2,gust) :- L >= 5.
+species_skill(pikachu,L,1,thunder_shock) :- L >= 1.
+species_skill(pikachu,L,2,quick_attack) :- L >= 5.
+species_skill(geodude,L,1,tackle) :- L >= 1.
+species_skill(geodude,L,2,rock_throw) :- L >= 5.
+species_skill(snorlax,L,1,tackle) :- L >= 1.
+species_skill(snorlax,L,2,rest) :- L >= 5.
+species_skill(articuno,L,1,gust) :- L >= 1.
+species_skill(articuno,L,2,ice_shard) :- L >= 5.
+species_skill(mewtwo, 20, 1, psychic_blast).
+species_skill(mewtwo,20,2,mind_shock).
 
 % Fungsi helper untuk mengambil skill spesies
 % species_skill(Species, Level, Slot, SkillName) :-

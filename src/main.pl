@@ -55,8 +55,7 @@ help :-
     write('run.'), nl,
     nl,
     write('--- Item ---'), nl,
-    write('use_super_potion(Slot).'), nl,
-    write('use_hyper_potion(Slot).'), nl,
+    write('use_healing_item(Slot, Item).'), nl,
     nl,
 
     write('--- Ganti Current Pokemon ---'), nl,

@@ -8,23 +8,24 @@ show_party :- showParty.
 
 % Menukar Pokémon antara party dan tas (selama tidak dalam pertarungan)
 % Menukar Pokémon antara party dan tas (selama tidak dalam pertarungan)
-setParty(_, _) :-
+setParty(IdxParty1Based, IdxBag) :-
     inBattle(_, _),
-    write('Tidak bisa menukar Pokémon saat dalam pertarungan!'), nl, !, fail.
+    write('Tidak bisa menukar Pokemon saat dalam pertarungan!'), nl, !, fail.
 
-setParty(IdxParty, IdxBag) :-
-    integer(IdxParty), integer(IdxBag),
-    IdxParty >= 0, IdxBag >= 0, IdxBag =< 39,
+setParty(IdxParty1Based, IdxBag) :-
+    integer(IdxParty1Based), integer(IdxBag),
+    IdxParty1Based >= 1, IdxBag >= 0, IdxBag =< 39,
     party(PokemonList),
     length(PokemonList, PartySize),
-    IdxParty < PartySize,
+    IdxParty0Based is IdxParty1Based - 1,
+    IdxParty0Based < PartySize,
     bag(IdxBag, pokeball(filled(PokemonID))),
-    nth0(IdxParty, PokemonList, CurrentPokemon),
-    swap_pokemon(IdxParty, IdxBag, CurrentPokemon, PokemonID),
+    nth0(IdxParty0Based, PokemonList, CurrentPokemon),
+    swap_pokemon(IdxParty0Based, IdxBag, CurrentPokemon, PokemonID),
     showParty, !.
 
 setParty(_, _) :-
-    write('Indeks tidak valid atau slot tas tidak berisi Pokémon!'), nl, fail.
+    write('Indeks tidak valid atau slot tas tidak berisi Pokemon!'), nl, fail.
 
 % Menukar posisi Pokémon antara party dan tas
 swap_pokemon(IdxParty, IdxBag, PartyPokemon, BagPokemon) :-

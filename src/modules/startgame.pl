@@ -1,7 +1,7 @@
 :- dynamic(move_left/1).
 
 chooseStarterPokemon :- 
-    write('Pilih 2 starter Pokémon (hanya common, level 1):'), nl,
+    write('Pilih 2 starter Pokemon (hanya common, level 1):'), nl,
     findall(Name, pokemon(Name, common, _, _, _, _, _, _), Commons),
     display_list_with_index(Commons, 1),  % Mulai dari 1
     chooseStarterPokemon_input(Commons).
@@ -40,6 +40,10 @@ initPlayer(Name) :-
     retractall(player_name(_)),
     assertz(player_name(Name)).
 
+startGame :-
+    player_name(_), !,
+    write('Game sudah dimulai! Tidak bisa memulai ulang.'), nl.
+  
 startGame :-
     write('Masukkan nama pemain: '),
     read(Name),
