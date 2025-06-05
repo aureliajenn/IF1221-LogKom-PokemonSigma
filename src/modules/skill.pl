@@ -35,22 +35,25 @@ skill(Slot) :-
             ( SkillName = rest -> maybe_apply_effect(EffectList, PlayerPokemon) ; true ),
 
             ( inBattle(_, EnemyPokemon),
-              pokemonInstance(EnemyPokemon, _, _, HPAfter, _, _) ->
-                ( HPAfter =< 0 ->
-                    write('Musuh berhasil dikalahkan!~n'),
-                    give_exp_and_drop(PlayerPokemon, EnemyPokemon),
-                    auto_catch_defeated(EnemyPokemon),
-                    retract(inBattle(PlayerPokemon, EnemyPokemon)),
-                    endGame
+                pokemonInstance(EnemyPokemon, _, _, HPAfter, _, _) ->
+                    ( HPAfter =< 0 ->
+                        format('Musuh berhasil dikalahkan!~n', []),
+                        give_exp_and_drop(PlayerPokemon, EnemyPokemon),
+                        auto_catch_defeated(EnemyPokemon),
+                        retract(inBattle(PlayerPokemon, EnemyPokemon)),
+                        endGame
+                    ;
+                        format('(Giliran monster lawan.)~n', []),
+                        enemy_turn(EnemyPokemon, PlayerPokemon)
+                    )
                 ;
-                    write('(Giliran monster lawan.)'), nl,
-                    enemy_turn(EnemyPokemon, PlayerPokemon)
-                )
-            ; ( inBattle(_, EnemyPokemon) ->
-                retractall(inBattle(PlayerPokemon, EnemyPokemon)),
-                endGame
-              ; true )
+                % Ini jalan jika inBattle tapi pokemonInstance musuh sudah tidak ada
+                ( inBattle(_, EnemyPokemon) ->
+                    retractall(inBattle(PlayerPokemon, EnemyPokemon)),
+                    endGame
+                ; true )
             )
+
         )
     ;
         write('Skill tidak tersedia pada slot tersebut.'), nl, fail

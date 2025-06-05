@@ -60,32 +60,41 @@ enemy_turn(EnemyID, PlayerID) :-
         format('~w menerima ~d damage!~n', [PlayerSpecies, Damage]),
         pokemonInstance(PlayerID, _, _, HPAfter, _, _),
         format('HP ~w sekarang: ~d~n', [PlayerSpecies, HPAfter]),
+
         (HPAfter =< 0 ->
-            write('Pokemonmu telah dikalahkan!~n'),
-            get_alive_party(AliveList),
-            remove_dead_from_list(PlayerID, AliveList, Remaining),
-            (Remaining == [] ->
-                write('Semua Pokemonmu sudah kalah. Kamu kalah total.~n'),
-                retract(inBattle(PlayerID, EnemyID))
-            ;
-                write('Silakan pilih Pokemon pengganti:~n'),
-                print_pokemon_list(Remaining, 1),
-                write('Masukkan indeks: '),
-                catch(read(Index), _, (write('Input tidak valid.'), nl, fail)),
-                Index0 is Index - 1,
-                length(Remaining, Len),
-                (Index0 >= 0, Index0 < Len ->
-                    nth0(Index0, Remaining, NewPlayerID),
-                    switch_active_pokemon(NewPlayerID),
-                    write('Pokemon telah diganti. Pertarungan dilanjutkan!~n'),
-                    enemy_turn(EnemyID, NewPlayerID)
+            format('Pokemonmu telah dikalahkan!~n', []),
+            (
+                EnemyID == mewtwo ->
+                    format('Semua Pokemon milikmu sudah tidak bisa bertarung...~n', []),
+                    format('Kamu kalah. Permainan selesai.~n', []),
+                    halt
                 ;
-                    write('Indeks tidak valid. Pertarungan dibatalkan.~n'),
-                    retract(inBattle(PlayerID, EnemyID))
-                )
+                    get_alive_party(AliveList),
+                    remove_dead_from_list(PlayerID, AliveList, Remaining),
+                    (Remaining == [] ->
+                        format('Semua Pokemonmu sudah kalah. Kamu kalah total.~n', []),
+                        retract(inBattle(PlayerID, EnemyID))
+                    ;
+                        format('Silakan pilih Pokemon pengganti:~n', []),
+                        print_pokemon_list(Remaining, 1),
+                        write('Masukkan indeks: '),
+                        catch(read(Index), _, (write('Input tidak valid.'), nl, fail)),
+                        Index0 is Index - 1,
+                        length(Remaining, Len),
+                        (Index0 >= 0, Index0 < Len ->
+                            nth0(Index0, Remaining, NewPlayerID),
+                            switch_active_pokemon(NewPlayerID),
+                            format('Pokemon telah diganti. Pertarungan dilanjutkan!~n', []),
+                            enemy_turn(EnemyID, NewPlayerID)
+                        ;
+                            format('Indeks tidak valid. Pertarungan dibatalkan.~n', []),
+                            retract(inBattle(PlayerID, EnemyID))
+                        )
+                    )
             )
         ; true)
     ).
+
 
 get_alive_party(AliveList) :-
     findall(ID,
@@ -119,4 +128,4 @@ give_exp_and_drop(PlayerID, EnemyID) :-
     assertz(pokemonInstance(PlayerID, Species, NewLevel, HP, ATK, DEF)),
     format('~w naik ke level ~d!~n', [Species, NewLevel]),
     add_item_to_bag(potion),
-    write('Kamu mendapatkan 1 potion!~n').
+    write('Kamu mendapatkan 1 potion!'), nl.

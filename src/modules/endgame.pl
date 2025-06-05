@@ -38,7 +38,8 @@ startBossBattle :-
     write('Command yang dapat digunakan selama pertarungan:'), nl,
     write('- attack.      : Serangan fisik standar'), nl,
     write('- defend.      : Bertahan, defense naik 30% selama 1 turn'), nl,
-    write('- skill(N).    : Gunakan skill ke-N (1 atau 2 jika Lv >= 10)'), nl.
+    write('- skill(N).    : Gunakan skill ke-N (1 atau 2 jika Lv >= 10)'), nl,
+    true.
 
 % Aturan akhir permainan
 endGame :-
@@ -67,4 +68,4 @@ endGame :-
     write('Kamu kalah. Permainan selesai.'), nl,
     halt, !.
 
-endGame :- true.
+endGame.
