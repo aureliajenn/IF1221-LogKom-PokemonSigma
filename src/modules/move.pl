@@ -5,10 +5,18 @@
 :- dynamic(party/1).
 :- dynamic(active_pokemon/1).
 
-
-move(Direction) :-
+move(_) :-
     inBattle(_, _),
     write('Anda sedang dalam pertarungan! Tidak bisa bergerak.'), nl, !, fail.
+
+move(_) :-
+    pending_encounter(Species, Level),
+    format('Kamu sedang menghadapi ~w liar (Lv.~d)!~n', [Species, Level]),
+    write('Gunakan command berikut:'), nl,
+    write('- battle.     : untuk memulai pertarungan'), nl,
+    write('- run.        : untuk melarikan diri'), nl,
+    write('- catch.      : untuk mencoba menangkap Pokemon'), nl,
+    !, fail.
 
 move(Direction) :-
     move_left(Moves),
@@ -69,6 +77,7 @@ interact(X, Y, Species, Level) :-
     assertz(pokemonInstance(EnemyID, Species, Level, HP, ATK, DEF)),
     assertz(temp_enemy_id(EnemyID)),
     assertz(encountered(Species, Rarity, BaseHP, BaseATK, Level, 0)),
+    assertz(pending_encounter(Species, Level)),
     write('Pilih aksi: battle. / catch. / run.'), nl.
 
 switch_active_pokemon(NewPlayerIdx) :-
@@ -193,3 +202,5 @@ heal_if_needed(PokemonID) :-
     ;
         true  % tidak ada output jika HP sudah penuh
     ).
+
+encounter_active :- pending_encounter(_, _).

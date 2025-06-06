@@ -45,6 +45,7 @@ startGame :-
     write('Game sudah dimulai! Tidak bisa memulai ulang.'), nl.
   
 startGame :-
+    write('~~~~~~~~~~~~~~~~~~~~~~ Selamat Datang di Game Pokemonsigma ~~~~~~~~~~~~~~~~~~~~~'), nl,
     write('Masukkan nama pemain: '),
     read(Name),
     assertz(player_name(Name)),

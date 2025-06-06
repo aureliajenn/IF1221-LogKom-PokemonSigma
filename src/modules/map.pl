@@ -82,26 +82,107 @@ get_available_coords(outside_grass, Coords) :-
         \+ grass(X,Y), \+ pokemon_liar(X,Y,_,_)
     ), Coords).
 
+% showMap :-
+%     size_of_map(W, H),
+%     ( player_pos(PX, PY) -> true ; PX = -1, PY = -1 ),
+%     ( move_left(MoveLeft) -> true ; MoveLeft = 0 ),
+%     format('Sisa langkah: ~d~n', [MoveLeft]),
+%     show_rows(0, H, W, PX, PY).
+
+% show_rows(Y, Height, _, _, _) :-
+%     Y >= Height, !.
+% show_rows(Y, Height, Width, PX, PY) :-
+%     show_columns(0, Width, Y, PX, PY), nl,
+%     Y1 is Y + 1,
+%     show_rows(Y1, Height, Width, PX, PY).
+
+% show_columns(X, Width, _, _, _) :-
+%     X >= Width, !.
+% show_columns(X, Width, Y, PX, PY) :-
+%     (X =:= PX, Y =:= PY -> write('P ')
+%     ; grass(X, Y) -> write('# ')
+%     ; pokemon_liar(X, Y, Species, _) -> (pokemon(Species, common, _, _, _, _, _, _) -> write('C ') ; write('. '))
+%     ; write('. ')),
+%     X1 is X + 1,
+%     show_columns(X1, Width, Y, PX, PY).
+
 showMap :-
     size_of_map(W, H),
     ( player_pos(PX, PY) -> true ; PX = -1, PY = -1 ),
     ( move_left(MoveLeft) -> true ; MoveLeft = 0 ),
-    format('Sisa langkah: ~d~n', [MoveLeft]),
+    
+    % Header informasi
+    format('Sisa langkah: ~d~n~n', [MoveLeft]),
+    write('Legenda:'), nl,
+    write('  P = Player'), nl,
+    write('  # = Grass'), nl,
+    write('  C = Common Pokemon'), nl,
+    write('  . = Empty'), nl, nl,
+    
+    % Header kolom
+    write('     '),
+    print_column_headers(0, W), nl,
+    
+    % Garis pembatas atas
+    write('   +'),
+    print_horizontal_border(W), nl,
+    
+    % Isi peta
     show_rows(0, H, W, PX, PY).
+
+% bagian ini ↓ DIHAPUS
+% % Garis pembatas bawah
+% write('   +'),
+% print_horizontal_border(W), nl.
+
+
+print_column_headers(X, Width) :-
+    X >= Width, !.
+print_column_headers(X, Width) :-
+    (X < 10 -> format(' %d  ', [X])
+    ; format('%d  ', [X])),
+    X1 is X + 1,
+    print_column_headers(X1, Width).
+
+print_horizontal_border(0) :- !.
+print_horizontal_border(N) :-
+    write('---+'),
+    N1 is N - 1,
+    print_horizontal_border(N1).
 
 show_rows(Y, Height, _, _, _) :-
     Y >= Height, !.
 show_rows(Y, Height, Width, PX, PY) :-
-    show_columns(0, Width, Y, PX, PY), nl,
+    % Nomor baris
+    (Y < 10 -> format(' %d |', [Y])
+    ; format('%d |', [Y])),
+
+    % Isi baris
+    show_columns(0, Width, Y, PX, PY),
+
+    % Penutup baris
+    format('|~n', []),
+
+    % Garis pembatas
+    write('   +'),
+    print_horizontal_border(Width), nl,
+
     Y1 is Y + 1,
     show_rows(Y1, Height, Width, PX, PY).
 
 show_columns(X, Width, _, _, _) :-
     X >= Width, !.
 show_columns(X, Width, Y, PX, PY) :-
-    (X =:= PX, Y =:= PY -> write('P ')
-    ; grass(X, Y) -> write('# ')
-    ; pokemon_liar(X, Y, Species, _) -> (pokemon(Species, common, _, _, _, _, _, _) -> write('C ') ; write('. '))
-    ; write('. ')),
+    ( X > 0 -> write('|') ; true ),  % <<< INI kuncinya: hanya print '|' jika bukan kolom pertama
+    
+    ( X =:= PX, Y =:= PY -> write(' P ')
+    ; grass(X, Y) -> write(' # ')
+    ; pokemon_liar(X, Y, Species, _) -> 
+        (pokemon(Species, common, _, _, _, _, _, _) -> write(' C ')
+        ; write(' C ')  % karena TUBES hanya butuh C
+        )
+    ; write(' . ')
+    ),
+
     X1 is X + 1,
     show_columns(X1, Width, Y, PX, PY).

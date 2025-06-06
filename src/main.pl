@@ -26,7 +26,7 @@ main :-
 
 game_loop :-
     repeat,
-    write('> '),
+    write('>>> '),
     read(Command),
     write('Command dibaca: '), write(Command), nl,
     (Command == quit -> write('Keluar dari game.'), nl, halt ;

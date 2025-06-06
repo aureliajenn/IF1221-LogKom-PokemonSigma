@@ -17,42 +17,74 @@ initBag(I, End, Value) :-
 /* Menampilkan isi tas */
 showBag :-
     write('=== Isi Tas ==='), nl,
-    write('Slot 00-19: Pokeball'), nl,
-    write('Slot 20-39: Item/Kosong'), nl, nl,
-    show_bag_slots(0, 39).
+    write('Slot 00 - 19: Pokeball'), nl,
+    write('Slot 20 - 39: Item/Kosong'), nl, nl,
+    write('+------+------------------------------------------+'), nl,
+    write('| Slot |                   Isi                    |'), nl,
+    write('+------+------------------------------------------+'), nl,
+    show_bag_slots_table(0, 39),
+    write('+------+------------------------------------------+'), nl.
 
-show_bag_slots(I, Max) :- I > Max, !.
-show_bag_slots(I, Max) :-
-    (bag(I, Item) -> true ; Item = kosong),
-    format_item(I, Item),
+/* Tampilkan slot dari tas dalam bentuk tabel */
+/* Tampilkan slot dari tas dalam bentuk tabel */
+show_bag_slots_table(I, Max) :- I > Max, !.
+show_bag_slots_table(I, Max) :-
+    (bag(I, Item) -> true ; Item = empty),  % Pastikan Item selalu terikat
+    pad_index(I, Padded),
+    describe_item(Item, Desc),
+    pad_right(Desc, 42, PaddedDesc),
+    format('|  ~w  |~w|~n', [Padded, PaddedDesc]),
     I1 is I + 1,
-    show_bag_slots(I1, Max).
+    show_bag_slots_table(I1, Max).
 
+/* Deskripsi item */
+describe_item(empty, '[Kosong]') :- !.
+describe_item(kosong, '[Kosong]') :- !.
+describe_item(pokeball(empty), 'Pokeball (Kosong)') :- !.
+describe_item(pokeball(filled(ID)), Desc) :-
+    (pokemonInstance(ID, Species, _, _, _, _) ->
+        atom_concat('Pokeball (Terisi oleh ', Species, Temp),
+        atom_concat(Temp, ')', Desc)
+    ;
+        number_codes(ID, IDCodes),
+        atom_codes(IDAtom, IDCodes),
+        atom_concat('Pokeball (Terisi oleh ID ', IDAtom, Temp),
+        atom_concat(Temp, ')', Desc)
+    ), !.
+describe_item(Item, Desc) :-
+    (var(Item) -> Desc = '[Unknown]' ;  % Handle uninstantiated variables
+    atom(Item) -> Desc = Item ;
+    term_to_atom(Item, Desc)), !.
+
+/* Format nomor slot menjadi dua digit */
 pad_index(Index, Padded) :-
     (Index < 10 ->
         number_codes(Index, Codes),
-        append("0", Codes, PaddedCodes)
+        atom_codes(IndexAtom, Codes),
+        atom_concat('0', IndexAtom, Padded)
     ;
-        number_codes(Index, PaddedCodes)
-    ),
-    atom_codes(Padded, PaddedCodes).
-
-format_item(Index, empty) :-
-    pad_index(Index, Padded),
-    format('Slot ~w: [Kosong]~n', [Padded]).
-format_item(Index, pokeball(empty)) :-
-    pad_index(Index, Padded),
-    format('Slot ~w: Pokeball (Kosong)~n', [Padded]).
-format_item(Index, pokeball(filled(ID))) :-
-    pad_index(Index, Padded),
-    (pokemonInstance(ID, Species, _, _, _, _) ->
-        format('Slot ~w: Pokeball (Terisi oleh ~w)~n', [Padded, Species])
-    ;
-        format('Slot ~w: Pokeball (Terisi oleh ID ~w)~n', [Padded, ID])
+        number_codes(Index, Codes),
+        atom_codes(Padded, Codes)
     ).
-format_item(Index, Item) :-
-    pad_index(Index, Padded),
-    format('Slot ~w: ~w~n', [Padded, Item]).
+
+/* Tambah padding spasi agar kolom sejajar */
+pad_right(Atom, TargetLength, Padded) :-
+    atom_chars(Atom, Chars),
+    length(Chars, Len),
+    Spaces is max(0, TargetLength - Len),
+    make_spaces(Spaces, SpaceAtom),
+    atom_chars(SpaceAtom, SpaceChars),
+    append(Chars, SpaceChars, ResultChars),
+    atom_chars(Padded, ResultChars).
+
+make_spaces(N, SpaceAtom) :-
+    (N =< 0 ->
+        SpaceAtom = ''
+    ;
+        length(L, N),
+        maplist(=(' '), L),
+        atom_chars(SpaceAtom, L)
+    ).
 
 /* Menambahkan item ke slot item (20–39) */
 find_empty_item_slot(Index) :-
@@ -75,27 +107,22 @@ find_empty_pokeball_slot(Slot) :-
 /* Memindahkan Pokémon yang dikalahkan ke tempat sesuai prioritas */
 move_defeated_to_party_or_bag(PokemonID) :-
     pokemonInstance(PokemonID, Species, _, _, _, _),
-    % Hapus dari party jika masih ada
     (party(Party) ->
         delete(Party, PokemonID, NewParty),
         retract(party(Party)),
         assertz(party(NewParty))
     ; true),
-
-    % Coba kembalikan ke party jika masih bisa
     (party(Current), length(Current, Len), Len < 4 ->
         append(Current, [PokemonID], NewParty),
         retract(party(Current)),
         assertz(party(NewParty)),
         format('~w dimasukkan kembali ke party.~n', [Species])
     ;
-        % Masukkan ke pokeball kosong jika tersedia
         (find_empty_pokeball_slot(Slot) ->
             retract(bag(Slot, pokeball(empty))),
             assertz(bag(Slot, pokeball(filled(PokemonID)))),
             format('~w dimasukkan ke pokeball slot ~d.~n', [Species, Slot])
         ;
-            % Simpan ke storage
             (storage(S) -> true ; S = []),
             retractall(storage(_)),
             append(S, [PokemonID], NewStorage),
@@ -104,7 +131,7 @@ move_defeated_to_party_or_bag(PokemonID) :-
         )
     ).
 
-/* Menambahkan Pokémon hasil tangkapan ke tempat yang sesuai */
+/* Menambahkan Pokémon ke party atau tempat lain jika penuh */
 add_pokemon_to_party_or_bag(ID, Species) :-
     (party(Party) ->
         length(Party, Len),

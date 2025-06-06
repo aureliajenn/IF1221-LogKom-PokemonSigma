@@ -8,3 +8,6 @@
 :- dynamic(player_pos/2).
 :- dynamic(bag/2).
 :- dynamic(storage/1).
+:- dynamic(encounter/2).
+:- dynamic(pending_encounter/2).
+:- dynamic(isDefending/1).

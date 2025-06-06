@@ -69,7 +69,7 @@ place_player_random :-
         between(0, H1, Y),
         \+ pokemon_liar(X, Y, _, _)
     ), List),  % termasuk rumput juga kalau tidak ada tempat kosong
-    write('Available tiles for player (including grass): '), write(List), nl,
+    % write('Available tiles for player (including grass): '), write(List), nl,
     ( List = [] ->
         write('Gagal menempatkan player!'), nl, fail
     ; random_member((PX, PY), List),
