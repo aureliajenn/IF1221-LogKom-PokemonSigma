@@ -34,7 +34,7 @@ move(Direction) :-
         check_cell_content(NewX, NewY),
         showMap, nl, !
     ;
-        write('Gagal bergerak! Kamu berada di ujung map.'), nl, !, fail
+        write('Gagal bergerak! Kamu berada di ujung map.'), nl, showMap, !, fail
     ).
 
 
@@ -80,49 +80,95 @@ interact(X, Y, Species, Level) :-
     assertz(pending_encounter(Species, Level)),
     write('Pilih aksi: battle. / catch. / run.'), nl.
 
-switch_active_pokemon(NewPlayerIdx) :-
-    party(Party),
-    length(Party, Len),
-    Index0 is NewPlayerIdx - 1,
-    (Index0 < 0 ; Index0 >= Len ->
-        write('Indeks tidak valid.'), nl, fail
+% switch_active_pokemon(NewPlayerIdx) :-
+%     party(Party),
+%     length(Party, Len),
+%     Index0 is NewPlayerIdx - 1,
+%     (Index0 < 0 ; Index0 >= Len ->
+%         write('Indeks tidak valid.'), nl, fail
+%     ;
+%         nth0(Index0, Party, NewID),
+%         pokemonInstance(NewID, Species, _, HP, _, _),
+%         (HP =< 0 ->
+%             write('Pokemon itu sudah pingsan dan tidak bisa digunakan!'), nl, fail
+%         ;
+%             (
+%                 % Cek apakah sudah aktif
+%                 (inBattle(CurrentID, _) ; active_pokemon(CurrentID)) ->
+%                     (CurrentID == NewID ->
+%                         format('Pokemon ~w sedang digunakan!~n', [Species]), fail
+%                     ;
+%                         (
+%                             inBattle(_, EnemyID) ->
+%                                 retractall(inBattle(_, _)),
+%                                 assertz(inBattle(NewID, EnemyID))
+%                             ;
+%                                 retractall(active_pokemon(_)),
+%                                 assertz(active_pokemon(NewID))
+%                         ),
+%                         format('Pokemon aktif diganti menjadi ~w!~n', [Species])
+%                     )
+%                 ;
+%                     % Jika tidak ada yang aktif (fallback)
+%                     (
+%                         inBattle(_, EnemyID) ->
+%                             retractall(inBattle(_, _)),
+%                             assertz(inBattle(NewID, EnemyID))
+%                         ;
+%                             retractall(active_pokemon(_)),
+%                             assertz(active_pokemon(NewID))
+%                     ),
+%                     format('Pokemon aktif diganti menjadi ~w!~n', [Species])
+%             )
+%         )
+%     ).
+/* Switch Active Pokemon - Versi Lengkap */
+switch_active_pokemon(NewPlayerID) :-
+    % Verifikasi Pokemon yang dipilih valid
+    pokemonInstance(NewPlayerID, Species, _, HP, _, _),
+    ( HP =< 0 ->
+        write('Pokemon itu sudah pingsan dan tidak bisa digunakan!'), nl, fail
     ;
-        nth0(Index0, Party, NewID),
-        pokemonInstance(NewID, Species, _, HP, _, _),
-        (HP =< 0 ->
-            write('Pokemon itu sudah pingsan dan tidak bisa digunakan!'), nl, fail
-        ;
-            (
-                % Cek apakah sudah aktif
-                (inBattle(CurrentID, _) ; active_pokemon(CurrentID)) ->
-                    (CurrentID == NewID ->
-                        format('Pokemon ~w sedang digunakan!~n', [Species]), fail
-                    ;
-                        (
-                            inBattle(_, EnemyID) ->
-                                retractall(inBattle(_, _)),
-                                assertz(inBattle(NewID, EnemyID))
-                            ;
-                                retractall(active_pokemon(_)),
-                                assertz(active_pokemon(NewID))
-                        ),
-                        format('Pokemon aktif diganti menjadi ~w!~n', [Species])
-                    )
-                ;
-                    % Jika tidak ada yang aktif (fallback)
-                    (
-                        inBattle(_, EnemyID) ->
-                            retractall(inBattle(_, _)),
-                            assertz(inBattle(NewID, EnemyID))
-                        ;
-                            retractall(active_pokemon(_)),
-                            assertz(active_pokemon(NewID))
-                    ),
-                    format('Pokemon aktif diganti menjadi ~w!~n', [Species])
-            )
-        )
+        % Update status berdasarkan konteks (dalam pertarungan atau tidak)
+        ( inBattle(CurrentID, EnemyID) -> 
+            % Dalam pertarungan
+            retractall(inBattle(_, _)),
+            assertz(inBattle(NewPlayerID, EnemyID)),
+            format('~w dikeluarkan untuk melanjutkan pertarungan!~n', [Species])
+        ; 
+            % Diluar pertarungan
+            retractall(active_pokemon(_)),
+            assertz(active_pokemon(NewPlayerID)),
+            format('~w sekarang menjadi Pokemon aktifmu!~n', [Species])
+        ),
+        
+        % Update active_pokemon dalam semua kasus
+        retractall(active_pokemon(_)),
+        assertz(active_pokemon(NewPlayerID)),
+        true
     ).
 
+/* Versi alternatif yang lebih eksplisit */
+switch_active_pokemon(Index) :-
+    integer(Index),
+    party(Party),
+    length(Party, Length),
+    between(1, Length, Index),
+    nth1(Index, Party, NewPlayerID),
+    pokemonInstance(NewPlayerID, Species, _, HP, _, _),
+    ( HP =< 0 ->
+        format('~w tidak bisa dipilih karena HP-nya sudah 0!~n', [Species]), fail
+    ;
+        ( inBattle(_, EnemyID) ->
+            retractall(inBattle(_, _)),
+            assertz(inBattle(NewPlayerID, EnemyID)),
+            format('~w dikeluarkan untuk melanjutkan pertarungan!~n', [Species])
+        ;
+            retractall(active_pokemon(_)),
+            assertz(active_pokemon(NewPlayerID)),
+            format('~w sekarang menjadi Pokemon aktifmu!~n', [Species])
+        )
+    ).
 
 
 

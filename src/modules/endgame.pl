@@ -66,6 +66,7 @@ endGame :-
     inBattle(_, mewtwo),
     write('Semua Pokemon milikmu sudah tidak bisa bertarung...'), nl,
     write('Kamu kalah. Permainan selesai.'), nl,
+    write('Game berakhir. Terima kasih telah bermain!'), nl,
     halt, !.
 
 endGame.

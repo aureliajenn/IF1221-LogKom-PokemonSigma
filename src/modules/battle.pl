@@ -13,7 +13,7 @@ battle :-
 
 battle :-
     \+ party(_),
-    write('Kamu belum memiliki Pokémon di party untuk bertarung!'), nl, !, fail.
+    write('Kamu belum memiliki Pokemon di party untuk bertarung!'), nl, !, fail.
 
 battle :-
     pending_encounter(Species, Level),
@@ -38,11 +38,19 @@ battle :-
     write('Command yang dapat digunakan selama pertarungan:'), nl,
     write('- attack.      : Serangan fisik standar'), nl,
     write('- defend.      : Bertahan, defense naik 30% selama 1 turn'), nl,
-    write('- skill(N).    : Gunakan skill ke-N (1 atau 2 jika Lv >= 10)'), nl,
-    write('- catch.       : Menangkap Pokémon liar (jika tersedia Pokéball kosong)'), nl,
-    write('- run.         : Kabur dari pertarungan'), nl.
+    write('- skill(N).    : Gunakan skill ke-N (1 atau 2 jika Lv >= 10)'), nl.
 
-% Mengakhiri pertarungan dan membersihkan status
+% Proteksi command catch.
+catch :-
+    inBattle(_, _),
+    write('Command catch tidak dapat dilakukan saat pertarungan.'), nl, !, fail.
+
+% Proteksi command run.
+run :-
+    inBattle(_, _),
+    write('Command run tidak dapat dilakukan saat pertarungan.'), nl, !, fail.
+
+/* Mengakhiri pertarungan dan membersihkan status */
 end_battle :-
     retractall(inBattle(_, _)),
     retractall(active_pokemon(_)),

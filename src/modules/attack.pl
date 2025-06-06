@@ -19,36 +19,33 @@ attack :-
         end_battle, !
     ;
         pokemonInstance(PlayerID, PlayerSpecies, _, HP, ATK, _),
-        (HP =< 0 ->
+        ( HP =< 0 ->
             write('Pokemonmu sudah tidak bisa bertarung!'), nl, !
         ;
             pokemonInstance(EnemyID, EnemySpecies, _, _, _, DEF),
-            Damage is max(1, floor((ATK / (DEF * 0.2)))),
+            Damage is max(1, floor(ATK / (DEF * 0.2))),
             apply_damage(EnemyID, Damage),
             format('~w menyerang dan memberi ~d damage ke ~w!~n', [PlayerSpecies, Damage, EnemySpecies]),
-            (
-                pokemonInstance(EnemyID, _, _, HPNew, _, _),
-                HPNew =< 0 ->
-                    format('~w dikalahkan!~n', [EnemySpecies]),
-                    give_exp_and_drop(PlayerID, EnemyID),
-                    end_battle
-                ;
-                    enemy_turn(EnemyID, PlayerID)
+            ( pokemonInstance(EnemyID, _, _, HPNew, _, _),
+              HPNew =< 0 ->
+                format('~w telah dikalahkan!~n', [EnemySpecies]),
+                give_exp_and_drop(PlayerID, EnemyID),
+                auto_catch_after_defeat(EnemyID),  % <--- Tambahan disini
+                end_battle
+            ;
+                enemy_turn(EnemyID, PlayerID)
             )
         )
     ).
 
 /* Enemy Turn */
 enemy_turn(EnemyID, PlayerID) :-
-    ( \+ pokemonInstance(EnemyID, _, _, _, _, _) ->
-        true
-    ;
-        pokemonInstance(EnemyID, _, _, HP, _, _),
-        HP =< 0 -> true
+    ( \+ pokemonInstance(EnemyID, _, _, _, _, _) -> true
+    ; pokemonInstance(EnemyID, _, _, HP, _, _), HP =< 0 -> true
     ;
         pokemonInstance(EnemyID, EnemySpecies, _, _, ATK, _),
         pokemonInstance(PlayerID, PlayerSpecies, _, _, _, DEF),
-        BaseDamage is max(1, floor((ATK / (DEF * 0.2)))),
+        BaseDamage is max(1, floor(ATK / (DEF * 0.2))),
         calculateDamage(EnemyID, PlayerID, BaseDamage, FinalDamage),
         apply_damage(PlayerID, FinalDamage),
         format('~w menyerang balik!~n', [EnemySpecies]),
@@ -56,41 +53,42 @@ enemy_turn(EnemyID, PlayerID) :-
 
         pokemonInstance(PlayerID, _, _, HPAfter, _, _),
         format('HP ~w sekarang: ~d~n', [PlayerSpecies, HPAfter]),
-        (
-            HPAfter =< 0 ->
-                write('Pokemonmu telah dikalahkan!'), nl,
-                get_alive_party(AliveList),
-                remove_dead_from_list(PlayerID, AliveList, Remaining),
-                (
-                    Remaining == [] -> 
-                        write('Semua Pokemonmu sudah kalah. Kamu kalah total.'), nl,
-                        end_battle
-                    ;
-                        choose_pokemon_replacement(Remaining, EnemyID)
-                )
+        nl,
+
+        ( HPAfter =< 0 ->
+            write('Pokemonmu telah dikalahkan!'), nl,
+            get_alive_party(AliveList),
+            remove_dead_from_list(PlayerID, AliveList, Remaining),
+            ( Remaining == [] ->
+                write('Semua Pokemonmu sudah kalah. Kamu kalah total.'), nl,
+                end_battle,
+                quit_game
             ;
-                true
+                choose_pokemon_replacement(Remaining, EnemyID)
+            )
+        ;
+            true
         )
     ).
 
+/* Choose Replacement */
 choose_pokemon_replacement(Remaining, EnemyID) :-
     write('Silakan pilih Pokemon pengganti:'), nl,
     print_pokemon_list(Remaining, 1),
     repeat,
     write('Masukkan indeks: '),
-    catch(read(Index), _, (write('Input tidak valid.'), nl, fail)),
+    read(Index),
     length(Remaining, Len),
-    (
-        Index >= 1, Index =< Len ->
-            nth1(Index, Remaining, NewPlayerID),
-            switch_active_pokemon(NewPlayerID),
-            write('Pokemon telah diganti. Pertarungan dilanjutkan!'), nl,
-            enemy_turn(EnemyID, NewPlayerID), !
-        ;
-            write('Indeks tidak valid. Silakan coba lagi.'), nl,
-            fail
+    ( integer(Index), Index >= 1, Index =< Len ->
+        nth1(Index, Remaining, NewPlayerID),
+        switch_active_pokemon(NewPlayerID),
+        pokemonInstance(NewPlayerID, Species, _, _, _, _),
+        format('Pokemon telah diganti menjadi ~w!~n', [Species]),
+        write('Ketik "attack." untuk melanjutkan pertarungan.'), nl, !
+    ;
+        write('Indeks tidak valid. Silakan coba lagi.'), nl,
+        fail
     ).
-
 
 /* Get Alive Party */
 get_alive_party(AliveList) :-
@@ -128,6 +126,22 @@ give_exp_and_drop(PlayerID, EnemyID) :-
     add_item_to_bag(potion),
     write('Kamu mendapatkan 1 potion!'), nl.
 
+/* Auto Catch setelah Pokemon liar dikalahkan */
+auto_catch_after_defeat(EnemyID) :-
+    pokemonInstance(EnemyID, Species, Level, HP, ATK, DEF),
+    retractall(encountered(_, _, _, _, _, _)),
+    assertz(encountered(Species, common, Level, HP, ATK, DEF)),
+
+    write('Pokemon dikalahkan, mencoba menangkap otomatis...'), nl,
+    ( find_empty_pokeball_slot(_) ->
+        store_encountered_pokemon,
+        write('Pokemon berhasil ditangkap dan disimpan!'), nl
+    ;
+        write('Tidak ada Pokeball kosong! Pokemon tidak bisa ditangkap.'), nl
+    ),
+
+    retractall(encountered(_, _, _, _, _, _)).
+
 /* End Battle */
 end_battle :-
     retractall(inBattle(_, _)),
@@ -135,4 +149,7 @@ end_battle :-
     retractall(pending_encounter(_, _)),
     write('Pertarungan berakhir.'), nl.
 
-
+/* Quit Game */
+quit_game :-
+    write('Game berakhir. Terima kasih telah bermain!'), nl,
+    halt.
