@@ -40,16 +40,6 @@ battle :-
     write('- defend.      : Bertahan, defense naik 30% selama 1 turn'), nl,
     write('- skill(N).    : Gunakan skill ke-N (1 atau 2 jika Lv >= 10)'), nl.
 
-% Proteksi command catch.
-catch :-
-    inBattle(_, _),
-    write('Command catch tidak dapat dilakukan saat pertarungan.'), nl, !, fail.
-
-% Proteksi command run.
-run :-
-    inBattle(_, _),
-    write('Command run tidak dapat dilakukan saat pertarungan.'), nl, !, fail.
-
 /* Mengakhiri pertarungan dan membersihkan status */
 end_battle :-
     retractall(inBattle(_, _)),

@@ -5,6 +5,10 @@
 :- dynamic(bag/2).
 :- dynamic(storage/1).
 
+catch :-
+    inBattle(_, _),
+    write('Command catch tidak dapat dilakukan saat pertarungan.'), nl, !, fail.
+
 % Command utama: mencoba menangkap Pokémon liar saat encounter berlangsung
 catch :-
     ( \+ encountered(Species, Rarity, _, _, _, _) ->
@@ -17,16 +21,38 @@ catch :-
             CatchRate is Base + Rand,
             format('Catch rate: ~d~n', [CatchRate]),
             ( CatchRate > 50 ->
-                write('Kamu berhasil menangkap Pokemon!~n'),
+                write('Kamu berhasil menangkap Pokemon!'), nl,
                 store_encountered_pokemon
             ;
-                write('Pokemon berhasil menghindar! Pertarungan berlanjut...~n'),
-                start_battle
+                write('Pokemon berhasil menghindar! Memulai pertarungan!'), nl,
+                start_battle_from_encounter
             )
         ;
             write('Tidak ada Pokeball kosong! Pokemon tidak bisa ditangkap.'), nl
         )
     ), !.
+
+start_battle_from_encounter :-
+    pending_encounter(Species, Level),
+    retract(pending_encounter(Species, Level)),
+    generate_pokemon_id(EnemyID),
+    pokemon(Species, Rarity, _, BaseHP, BaseATK, BaseDEF, _, _),
+    HP is BaseHP + Level * 2,
+    ATK is BaseATK + Level,
+    DEF is BaseDEF + Level,
+    assertz(pokemonInstance(EnemyID, Species, Level, HP, ATK, DEF)),
+
+    ( active_pokemon(PlayerID) -> true ; (party([PlayerID|_]), assertz(active_pokemon(PlayerID)))),    
+    assertz(inBattle(PlayerID, EnemyID)),
+
+    pokemonInstance(PlayerID, PlayerSpecies, _, _, _, _),
+    write('Pertarungan dimulai!'), nl,
+    format('Pertarungan dimulai antara ~w dan ~w!~n~n', [PlayerSpecies, Species]),
+
+    write('Command yang dapat digunakan selama pertarungan:'), nl,
+    write('- attack.      : Serangan fisik standar'), nl,
+    write('- defend.      : Bertahan, defense naik 30% selama 1 turn'), nl,
+    write('- skill(N).    : Gunakan skill ke-N (1 atau 2 jika Lv >= 10)'), nl.
 
 % Menyimpan Pokémon liar yang berhasil ditangkap ke party/bag/storage
 store_encountered_pokemon :-

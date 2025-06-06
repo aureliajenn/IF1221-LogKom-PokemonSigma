@@ -84,7 +84,7 @@ choose_pokemon_replacement(Remaining, EnemyID) :-
         switch_active_pokemon(NewPlayerID),
         pokemonInstance(NewPlayerID, Species, _, _, _, _),
         format('Pokemon telah diganti menjadi ~w!~n', [Species]),
-        write('Ketik "attack." untuk melanjutkan pertarungan.'), nl, !
+        write('Pertarungan dilanjutkan.'), nl, !
     ;
         write('Indeks tidak valid. Silakan coba lagi.'), nl,
         fail
