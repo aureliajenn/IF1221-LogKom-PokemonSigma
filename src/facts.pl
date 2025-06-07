@@ -1,6 +1,6 @@
 /*fakta pokemon(Species, Rarity, Type, BaseHP, BaseATK, BaseDEF, EvolveTo, EvolveLVL)*/
-pokemon(charmander, common, fire, 35, 15, 10, charmeleon, 15).
-pokemon(squirtle, common, water, 40, 12, 15, wartortle, 15).
+pokemon(charmander, common, fire, 35, 15, 10, charmeleon, 10).
+pokemon(squirtle, common, water, 40, 12, 15, wartortle, 10).
 pokemon(pidgey, common, flying, 30, 14, 10, none, -1).
 pokemon(charmeleon, common, fire, 55, 25, 20, none, -1).
 pokemon(wartortle, common, water, 60, 22, 25, none, -1).
