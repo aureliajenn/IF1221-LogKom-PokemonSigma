@@ -29,7 +29,7 @@ showBag :-
 /* Tampilkan slot dari tas dalam bentuk tabel */
 show_bag_slots_table(I, Max) :- I > Max, !.
 show_bag_slots_table(I, Max) :-
-    (bag(I, Item) -> true ; Item = empty),  % Pastikan Item selalu terikat
+    (bag(I, Item) -> true ; Item = empty),
     pad_index(I, Padded),
     describe_item(Item, Desc),
     pad_right(Desc, 42, PaddedDesc),
@@ -52,7 +52,7 @@ describe_item(pokeball(filled(ID)), Desc) :-
         atom_concat(Temp, ')', Desc)
     ), !.
 describe_item(Item, Desc) :-
-    (var(Item) -> Desc = '[Unknown]' ;  % Handle uninstantiated variables
+    (var(Item) -> Desc = '[Unknown]' ;
     atom(Item) -> Desc = Item ;
     term_to_atom(Item, Desc)), !.
 
@@ -104,7 +104,7 @@ find_empty_pokeball_slot(Slot) :-
     between(0, 19, Slot),
     bag(Slot, pokeball(empty)), !.
 
-/* Memindahkan Pokémon yang dikalahkan ke tempat sesuai prioritas */
+/* Memindahkan Pokemon yang dikalahkan ke tempat sesuai prioritas */
 move_defeated_to_party_or_bag(PokemonID) :-
     pokemonInstance(PokemonID, Species, _, _, _, _),
     (party(Party) ->
@@ -131,7 +131,7 @@ move_defeated_to_party_or_bag(PokemonID) :-
         )
     ).
 
-/* Menambahkan Pokémon ke party atau tempat lain jika penuh */
+/* Menambahkan Pokemon ke party atau tempat lain jika penuh */
 add_pokemon_to_party_or_bag(ID, Species) :-
     (party(Party) ->
         length(Party, Len),

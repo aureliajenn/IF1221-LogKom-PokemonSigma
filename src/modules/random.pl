@@ -47,8 +47,8 @@ shuffle([], []).
 shuffle(List, [X|Rest]) :-
     length(List, Len),
     Len > 0,
-    random_fix(1, Len, Index),  % <- ganti 0 dengan 1
-    nth1(Index, List, X),       % <- pakai nth1, bukan nth
+    random_fix(1, Len, Index),
+    nth1(Index, List, X),
     deleteg(X, List, NewList),
     shuffle(NewList, Rest).
 
@@ -68,7 +68,7 @@ place_player_random :-
         between(0, W1, X),
         between(0, H1, Y),
         \+ pokemon_liar(X, Y, _, _)
-    ), List),  % termasuk rumput juga kalau tidak ada tempat kosong
+    ), List), 
     % write('Available tiles for player (including grass): '), write(List), nl,
     ( List = [] ->
         write('Gagal menempatkan player!'), nl, fail

@@ -124,12 +124,10 @@ interact(X, Y, Species, Level) :-
 %     ).
 /* Switch Active Pokemon - Versi Lengkap */
 switch_active_pokemon(NewPlayerID) :-
-    % Verifikasi Pokemon yang dipilih valid
     pokemonInstance(NewPlayerID, Species, _, HP, _, _),
     ( HP =< 0 ->
         write('Pokemon itu sudah pingsan dan tidak bisa digunakan!'), nl, fail
     ;
-        % Update status berdasarkan konteks (dalam pertarungan atau tidak)
         ( inBattle(CurrentID, EnemyID) -> 
             % Dalam pertarungan
             retractall(inBattle(_, _)),
@@ -142,7 +140,6 @@ switch_active_pokemon(NewPlayerID) :-
             format('~w sekarang menjadi Pokemon aktifmu!~n', [Species])
         ),
         
-        % Update active_pokemon dalam semua kasus
         retractall(active_pokemon(_)),
         assertz(active_pokemon(NewPlayerID)),
         true
@@ -243,10 +240,10 @@ heal_if_needed(PokemonID) :-
         NewHP is min(TempHP, MaxHP),
         retract(pokemonInstance(PokemonID, Species, Level, HP, ATK, DEF)),
         assertz(pokemonInstance(PokemonID, Species, Level, NewHP, ATK, DEF)),
-        write('HP Pokemon dipulihkan sebanyak 20% dari total max HP masing-masing.'), nl,  % (opsional, sesuai spesifikasi)
+        write('HP Pokemon dipulihkan sebanyak 20% dari total max HP masing-masing.'), nl, 
         format('HP ~w bertambah menjadi ~d/~d~n', [Species, NewHP, MaxHP])
     ;
-        true  % tidak ada output jika HP sudah penuh
+        true 
     ).
 
 encounter_active :- pending_encounter(_, _).

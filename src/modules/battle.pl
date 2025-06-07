@@ -2,14 +2,14 @@
 :- dynamic(pending_encounter/2).
 :- dynamic(active_pokemon/1).
 
-/* Memulai pertarungan antara Pokémon pertama di party dan Pokémon liar yang telah disiapkan */
+/* Memulai pertarungan antara Pokemon pertama di party dan Pokemon liar yang telah disiapkan */
 battle :-
     inBattle(_, _),
     write('Pertarungan sedang berlangsung!'), nl, !, fail.
 
 battle :-
     \+ pending_encounter(_, _),
-    write('Tidak ada Pokémon liar yang sedang ditemui.'), nl, !, fail.
+    write('Tidak ada Pokemon liar yang sedang ditemui.'), nl, !, fail.
 
 battle :-
     \+ party(_),
@@ -25,7 +25,7 @@ battle :-
     DEF is BaseDEF + Level,
     assertz(pokemonInstance(EnemyID, Species, Level, HP, ATK, DEF)),
 
-    % Pilih Pokémon pemain (aktif atau head party)
+    % Pilih Pokemon pemain (aktif atau head party)
     (active_pokemon(PlayerID) -> true ; (party([PlayerID|_]), assertz(active_pokemon(PlayerID)))),
 
     assertz(inBattle(PlayerID, EnemyID)),
@@ -44,5 +44,5 @@ battle :-
 end_battle :-
     retractall(inBattle(_, _)),
     retractall(active_pokemon(_)),
-    retractall(pending_encounter(_, _)),  % opsional untuk bersih total
+    retractall(pending_encounter(_, _)),
     write('Pertarungan berakhir.'), nl.

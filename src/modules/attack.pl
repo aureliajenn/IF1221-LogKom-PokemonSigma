@@ -30,7 +30,7 @@ attack :-
               HPNew =< 0 ->
                 format('~w telah dikalahkan!~n', [EnemySpecies]),
                 give_exp_and_drop(PlayerID, EnemyID),
-                auto_catch_after_defeat(EnemyID),  % <--- Tambahan disini
+                auto_catch_after_defeat(EnemyID),
                 end_battle
             ;
                 enemy_turn(EnemyID, PlayerID)

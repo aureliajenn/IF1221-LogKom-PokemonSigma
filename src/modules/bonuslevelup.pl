@@ -29,5 +29,5 @@ try_level_up(ID) :-
         format('🧬 %w berevolusi menjadi %w!~n', [Species, EvolvedSpecies])
     ; true),
 
-    try_level_up(ID).  % lanjutkan jika masih bisa level up
-try_level_up(_) :- true.  % berhenti jika tidak cukup EXP
+    try_level_up(ID).
+try_level_up(_) :- true.

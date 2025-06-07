@@ -130,7 +130,6 @@ showMap :-
     % Isi peta
     show_rows(0, H, W, PX, PY).
 
-% bagian ini ↓ DIHAPUS
 % % Garis pembatas bawah
 % write('   +'),
 % print_horizontal_border(W), nl.
@@ -173,13 +172,13 @@ show_rows(Y, Height, Width, PX, PY) :-
 show_columns(X, Width, _, _, _) :-
     X >= Width, !.
 show_columns(X, Width, Y, PX, PY) :-
-    ( X > 0 -> write('|') ; true ),  % <<< INI kuncinya: hanya print '|' jika bukan kolom pertama
+    ( X > 0 -> write('|') ; true ),
     
     ( X =:= PX, Y =:= PY -> write(' P ')
     ; grass(X, Y) -> write(' # ')
     ; pokemon_liar(X, Y, Species, _) -> 
         (pokemon(Species, common, _, _, _, _, _, _) -> write(' C ')
-        ; write(' C ')  % karena TUBES hanya butuh C
+        ; write(' C ')
         )
     ; write(' . ')
     ),

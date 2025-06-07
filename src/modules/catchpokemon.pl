@@ -9,7 +9,7 @@ catch :-
     inBattle(_, _),
     write('Command catch tidak dapat dilakukan saat pertarungan.'), nl, !, fail.
 
-% Command utama: mencoba menangkap Pokémon liar saat encounter berlangsung
+% Command utama: mencoba menangkap Pokemon liar saat encounter berlangsung
 catch :-
     ( \+ encountered(Species, Rarity, _, _, _, _) ->
         write('Tidak ada Pokemon liar yang bisa ditangkap!'), nl
@@ -54,7 +54,7 @@ start_battle_from_encounter :-
     write('- defend.      : Bertahan, defense naik 30% selama 1 turn'), nl,
     write('- skill(N).    : Gunakan skill ke-N (1 atau 2 jika Lv >= 10)'), nl.
 
-% Menyimpan Pokémon liar yang berhasil ditangkap ke party/bag/storage
+% Menyimpan Pokemon liar yang berhasil ditangkap ke party/bag/storage
 store_encountered_pokemon :-
     encountered(Species, Rarity, BaseHP, BaseATK, Level, _),
     generate_pokemon_id(ID),
@@ -64,13 +64,12 @@ store_encountered_pokemon :-
     assertz(pokemonInstance(ID, Species, Level, HP, ATK, DEF)),
     add_pokemon_to_party_or_bag(ID, Species),
     format('~w masuk ke party atau Pokeball!~n', [Species]),
-    % Bersihkan encounter yang sudah ditangkap
     retract(encountered(Species, Rarity, BaseHP, BaseATK, Level, _)),
     retractall(temp_enemy_id(_)),
     retractall(pokemon_liar(_, _, Species, Level)),
     end_battle.
 
-% Prioritas penyimpanan: Party → Pokeball → Storage
+% Prioritas penyimpanan: Party, Pokeball, Storage
 add_pokemon_to_party_or_bag(ID, Species) :-
     ( party(Party) ->
         length(Party, Len),
@@ -98,12 +97,12 @@ add_pokemon_to_party_or_bag(ID, Species) :-
         format('~w dimasukkan ke dalam party baru.~n', [Species])
     ).
 
-% Mencari slot pokéball kosong di tas (slot 0–19)
+% Mencari slot pokeball kosong di tas (slot 0–19)
 find_empty_pokeball_slot(Slot) :-
     between(0, 19, Slot),
     bag(Slot, pokeball(empty)), !.
 
-% Menangkap otomatis jika Pokémon dikalahkan dalam pertarungan
+% Menangkap otomatis jika Pokemon dikalahkan dalam pertarungan
 % auto_catch_defeated(_EnemyID) :-
 %     ( encountered(Species, Rarity, BaseHP, BaseATK, Level, _) ->
 %         format('Kamu mencoba menangkap ~w setelah mengalahkannya...~n', [Species]),
@@ -113,7 +112,7 @@ find_empty_pokeball_slot(Slot) :-
 %             CatchRate is Base + Rand,
 %             format('Catch rate: ~d~n', [CatchRate]),
 %             ( CatchRate > 50 ->
-%                 write('Berhasil menangkap Pokémon setelah mengalahkannya!~n'),
+%                 write('Berhasil menangkap Pokemon setelah mengalahkannya!~n'),
 %                 store_encountered_pokemon
 %             ;
 %                 write('Pokemon kabur meski sudah dikalahkan...~n'),

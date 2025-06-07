@@ -4,14 +4,14 @@
 :- dynamic(inBattle/2).
 :- dynamic(status/3).
 
-% Mengecek apakah semua Pokémon pemain telah pingsan
+% Mengecek apakah semua Pokemon pemain telah pingsan
 is_all_fainted([]).
 is_all_fainted([ID|Rest]) :-
     pokemonInstance(ID, _, _, HP, _, _),
     HP =< 0,
     is_all_fainted(Rest).
 
-% Memilih Pokémon pertama yang masih hidup dari party
+% Memilih Pokemon pertama yang masih hidup dari party
 select_valid_active([ID|_], ID) :-
     pokemonInstance(ID, _, _, HP, _, _),
     HP > 0, !.

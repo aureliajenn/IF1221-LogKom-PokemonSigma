@@ -3,7 +3,7 @@
 chooseStarterPokemon :- 
     write('Pilih 2 starter Pokemon (hanya common, level 1):'), nl,
     findall(Name, pokemon(Name, common, _, _, _, _, _, _), Commons),
-    display_list_with_index(Commons, 1),  % Mulai dari 1
+    display_list_with_index(Commons, 1),
     chooseStarterPokemon_input(Commons).
 
 chooseStarterPokemon_input(Commons) :-
@@ -49,8 +49,8 @@ startGame :-
     write('Masukkan nama pemain: '),
     read(Name),
     assertz(player_name(Name)),
-    assertz(move_left(20)),  % inisialisasi langkah
-    setBag,                  % ← ganti dari initBag ke setBag
+    assertz(move_left(20)),  
+    setBag,                  
     chooseStarterPokemon,
     ( generateMap -> 
         write('Game berhasil dimulai untuk pemain '), write(Name), nl
