@@ -1,8 +1,8 @@
 :- dynamic(move_left/1).
 
 chooseStarterPokemon :- 
-    write('Pilih 2 starter Pokemon (hanya common, level 1):'), nl,
-    findall(Name, pokemon(Name, common, _, _, _, _, _, _), Commons),
+    write('Pilih 2 starter Pokemon:'), nl,
+    findall(Name, (pokemon(Name, common, _, _, _, _, _, _), \+ member(Name, [charmeleon, wartortle])), Commons),
     display_list_with_index(Commons, 1),
     chooseStarterPokemon_input(Commons).
 
