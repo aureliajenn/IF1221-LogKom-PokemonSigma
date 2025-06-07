@@ -45,4 +45,5 @@ end_battle :-
     retractall(inBattle(_, _)),
     retractall(active_pokemon(_)),
     retractall(pending_encounter(_, _)),
+    retractall(isDefending(_)), 
     write('Pertarungan berakhir.'), nl.
