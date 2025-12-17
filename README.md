@@ -40,3 +40,9 @@ cd IF1221-LogKom-PokemonSigma
 ---
 
 ## Contributors
+| NIM      | Nama                     |
+|:---------|:-------------------------|
+| 13524073 | Keisha Rizka Syofyani    |
+| 13524089 | Aurelia Jennifer Gunawan |
+| 13524109 | Helena Kristela Sarhawa  |
+| 13524137 | Reysha Syafitri Mulya R. |
